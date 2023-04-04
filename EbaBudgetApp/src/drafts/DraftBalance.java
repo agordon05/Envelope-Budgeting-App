@@ -1,6 +1,5 @@
 package drafts;
 
-import tickets.RequestTicket;
 import tickets.ResponseTicket;
 
 public class DraftBalance {

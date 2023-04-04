@@ -22,7 +22,8 @@ public class Statement {
 		this.amount = amount;
 		this.tip = tip;
 		this.pending = pending;
-		this.envAmount = envAmount;
+		if(envAmount == null) this.envAmount = new ArrayList<StatementSplits>();
+		else this.envAmount = envAmount;
 		this.date = date;
 	}
 

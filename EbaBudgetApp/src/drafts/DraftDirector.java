@@ -1,6 +1,5 @@
 package drafts;
 
-import dataObjects.Vendor;
 import moduleObjects.EnvelopeModule;
 import moduleObjects.StatementModule;
 import moduleObjects.VendorModule;
@@ -9,20 +8,7 @@ import tickets.ResponseTicket;
 
 public class DraftDirector {
 
-	/*
-	 * CREATE
-	 * REMOVE
-	 * EDIT
-	 * MERGE
-	 * SPLIT
-	 * 
-	 * 
-	 * STATEMENT
-	 * ENVELOPE
-	 * VENDOR
-	 * BALANCE
-	 * 
-	 * */
+
 	public static ResponseTicket draftStatementRequest(RequestTicket request, StatementModule module) {
 		
 		ResponseTicket response = new ResponseTicket();
