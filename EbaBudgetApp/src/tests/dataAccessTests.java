@@ -18,9 +18,9 @@ class dataAccessTests {
 	@Test
 	void EnvelopeAccess() {
 		EnvelopeAccess.Initialize();
-		Envelope e1 = new Envelope(0, "e1", 0, EnvelopeSettings.amount, 20, true, 50);
-		Envelope e2 = new Envelope(0, "e2", 0, EnvelopeSettings.amount, 20, true, 50);
-		Envelope e3 = new Envelope(0, "e3", 0, EnvelopeSettings.amount, 20, true, 50);
+		Envelope e1 = new Envelope(0, "e1", 0, EnvelopeSettings.amount, 20, true, 50, false, false);
+		Envelope e2 = new Envelope(0, "e2", 0, EnvelopeSettings.amount, 20, true, 50, false, false);
+		Envelope e3 = new Envelope(0, "e3", 0, EnvelopeSettings.amount, 20, true, 50, false, false);
 		EnvelopeAccess.addEnvelope(e1);
 		EnvelopeAccess.addEnvelope(e2);
 		EnvelopeAccess.addEnvelope(e3);

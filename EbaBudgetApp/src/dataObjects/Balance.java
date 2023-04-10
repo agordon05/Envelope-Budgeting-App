@@ -2,6 +2,7 @@ package dataObjects;
 
 public class Balance {
 	
+	//overall balance in account
 	private double balance;
 	
 	public Balance(double amount) {

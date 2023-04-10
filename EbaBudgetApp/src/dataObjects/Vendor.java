@@ -2,8 +2,11 @@ package dataObjects;
 
 public class Vendor {
 
+	//vendor name
 	private String name;
+	//preferred name user set for vendor
 	private String prefName;
+	//preferred envelope for statements made by this envelope
 	private String prefEnvelope;
 	
 	public Vendor(String name, String prefName, String prefEnvelope) {

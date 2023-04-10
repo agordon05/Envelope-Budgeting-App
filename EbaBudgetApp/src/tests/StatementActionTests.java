@@ -25,8 +25,8 @@ class StatementActionTests {
 		Statement s1 = new Statement(0, "s1", null, 50, 0, true, null, null);
 		Statement s2 = new Statement(0, "s2", null, 50, 50, true, null, null);
 		//int priority, String name, double amount, int fillSetting, double fillAmount, boolean cap, double capAmount
-		Envelope e1 = new Envelope(0, "e1", 0, 0, 0, false, 0);
-		Envelope e2 = new Envelope(0, "e2", 0, 0, 0, false, 0);
+		Envelope e1 = new Envelope(0, "e1", 0, 0, 0, false, 0, false, false);
+		Envelope e2 = new Envelope(0, "e2", 0, 0, 0, false, 0, false, false);
 		
 		ArrayList<StatementSplits> splits = new ArrayList<>();
 		
@@ -98,8 +98,8 @@ class StatementActionTests {
 		Statement s1 = new Statement(0, "s1", null, 50, 0, true, null, null);
 		Statement s2 = new Statement(0, "s2", null, 50, 50, true, null, null);
 		//int priority, String name, double amount, int fillSetting, double fillAmount, boolean cap, double capAmount
-		Envelope e1 = new Envelope(0, "e1", 0, 0, 0, false, 0);
-		Envelope e2 = new Envelope(0, "e2", 0, 0, 0, false, 0);
+		Envelope e1 = new Envelope(0, "e1", 0, 0, 0, false, 0, false, false);
+		Envelope e2 = new Envelope(0, "e2", 0, 0, 0, false, 0, false, false);
 		
 				
 		//no statement split for e1

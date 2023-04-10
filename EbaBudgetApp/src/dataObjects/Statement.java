@@ -5,13 +5,21 @@ import java.util.Date;
 
 public class Statement {
 
+	//unique id for statement
 	private int ID;
+	//preferred name for statement
 	private String name;
+	//vendor of statement
 	private String vendor;
+	//amount of statement
 	private double amount;
+	//expected tip from statement, if statement is pending, statement amount may change
 	private double tip;
+	//if statement is pending
 	private boolean pending;
+	//list of amounts to be associated with each envelope
 	private ArrayList<StatementSplits> envAmount;
+	//date Statement was created
 	private Date date;
 
 	public Statement(int id, String name, String vendor, double amount, double tip, boolean pending, ArrayList<StatementSplits> envAmount, Date date) {

@@ -71,7 +71,7 @@ public class StatementActions {
 			}
 			split2.amount += amount;
 
-
+			response.addInfoMessage("Allocated $" + amount + " to " + e2.getName());
 		}
 		//removing money from envelope
 		else if(split2 == null) {
@@ -81,6 +81,7 @@ public class StatementActions {
 				return;
 			}
 			split1.amount -= amount;
+			response.addInfoMessage("Allocated $" + amount + " from " + e1.getName());
 
 		}
 		//Transferring money allocated from one envelope to another
@@ -96,6 +97,7 @@ public class StatementActions {
 
 			split1.amount -= amount;
 			split2.amount += amount;
+			response.addInfoMessage("Allocated $" + amount + " to " + e2.getName() + " from " + e1.getName());
 
 		}
 
@@ -137,15 +139,16 @@ public class StatementActions {
 		//the pending for the statement does not change, amount is the tip
 		if(pending) {
 			statement.setTip(amount);
+			response.addInfoMessage("statement has a tip of " + amount);
 		}
 		//the statement is no longer pending, remove tip and set true amount
 		else {
 			statement.setPending(false);
 			statement.setTip(0);
 			statement.setAmount(amount);
+			response.addInfoMessage("Statement is no longer pending, statement amount is " + amount);
 		}
 
-		
 	}
 
 

@@ -30,7 +30,7 @@ public class EnvelopeAccess {
 	}
 
 	public static Envelope addEnvelope(Envelope e) {
-		Envelope temp = new Envelope(getNextPriority(), e.getName(), e.getAmount(), e.getFillSetting(), e.getFillAmount(), e.hasCap(), e.getCapAmount());
+		Envelope temp = new Envelope(getNextPriority(), e.getName(), e.getAmount(), e.getFillSetting(), e.getFillAmount(), e.hasCap(), e.getCapAmount(), e.isExtra(), e.isDefault());
 		envelopes.add(temp);
 		return temp;
 	}

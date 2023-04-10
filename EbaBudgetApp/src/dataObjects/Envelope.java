@@ -2,15 +2,26 @@ package dataObjects;
 
 public class Envelope {
 	
+	//order that envelopes will be filled, exeption is if fillSetting is set to percentage
 	private int priority;
+	//unique name of envelope
 	private String name;
+	//amount inside envelope
 	private double amount;
+	//setting for how an envelope will be filled
 	private int fillSetting;
+	//setting for amount to fill an envelope depending on fillSetting
 	private double fillAmount;
+	//if there is a cap for how much an envelope can be filled
 	private boolean cap;
+	//amount an envelope can be filled if there is a cap
 	private double capAmount;
+	//if envelope is extra, when desposit fills all envelopes, put the left over amount into this envelope
+	private boolean extra;
+	//if envelope is Default, when a withdraw amount is more than what an envelope has, take amount from here before other envelopes
+	private boolean Default;
 	
-	public Envelope(int priority, String name, double amount, int fillSetting, double fillAmount, boolean cap, double capAmount) {
+	public Envelope(int priority, String name, double amount, int fillSetting, double fillAmount, boolean cap, double capAmount, boolean extra, boolean Default) {
 		this.priority = priority;
 		this.name = name;
 		this.amount = amount;
@@ -18,6 +29,8 @@ public class Envelope {
 		this.fillAmount = fillAmount;
 		this.cap = cap;
 		this.capAmount = capAmount;
+		this.extra = extra;
+		this.Default = Default;
 	}
 	
 	
@@ -64,6 +77,12 @@ public class Envelope {
 	public double getCapAmount() {
 		return capAmount;
 	}
+	public boolean isExtra() {
+		return this.extra;
+	}
+	public boolean isDefault() {
+		return this.Default;
+	}
 	/**
 	 * @param priority the priority to set
 	 */
@@ -106,7 +125,12 @@ public class Envelope {
 	public void setCapAmount(double capAmount) {
 		this.capAmount = capAmount;
 	}
-	
+	public void setExtra(boolean extra) {
+		this.extra = extra;
+	}
+	public void setDefault(boolean Default) {
+		this.Default = Default;
+	}
 	
 	
 	
