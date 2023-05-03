@@ -9,6 +9,13 @@ public class Vendor {
 	//preferred envelope for statements made by this envelope
 	private String prefEnvelope;
 	
+	public Vendor(String name) {
+		this.name = name;
+		this.prefName = "";
+		this.prefEnvelope = "";
+	}
+	
+	
 	public Vendor(String name, String prefName, String prefEnvelope) {
 		this.name = name;
 		this.prefName = prefName;

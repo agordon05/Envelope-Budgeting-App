@@ -28,13 +28,13 @@ public class StatementAccess {
 		return null;
 	}
 		
-	public static Statement addEnvelope(Statement e) {
+	public static Statement addStatement(Statement e) {
 		Statement temp = new Statement(getNextID(), e.getName(), e.getVendor(), e.getAmount(), e.getTip(), e.isPending(), e.getEnvAmount(), e.getDate());
 		statements.add(temp);
 		return temp;
 	}
 	
-	public static boolean removeEnvelope(int id) {
+	public static boolean removeStatement(int id) {
 		Statement temp = getStatementByID(id);
 		if(temp == null) return false;
 		statements.remove(temp);

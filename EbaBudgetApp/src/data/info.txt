@@ -1,0 +1,11 @@
+0.0
+1#Savings#0.0#3#30#false#0#false#false
+2#Personal#0.0#3#40#false#0#true#false
+3#Groceries#0.0#1#0#true#160#false#false
+4#Puppy Expenses#0.0#3#70#true#200#false#false
+5#Maintenance#0.0#3#10#false#0#false#false
+6#Vape#0.0#3#20#true#50#false#false
+7#Gas#0.0#3#30#false#0#false#false
+8#Haircut#0.0#3#5#true#30#false#false
+9#Holdings#0.0#1#0#true#300#false#false
+

@@ -11,17 +11,17 @@ public class Envelope {
 	//setting for how an envelope will be filled
 	private int fillSetting;
 	//setting for amount to fill an envelope depending on fillSetting
-	private double fillAmount;
+	private int fillAmount;
 	//if there is a cap for how much an envelope can be filled
 	private boolean cap;
 	//amount an envelope can be filled if there is a cap
-	private double capAmount;
+	private int capAmount;
 	//if envelope is extra, when desposit fills all envelopes, put the left over amount into this envelope
 	private boolean extra;
 	//if envelope is Default, when a withdraw amount is more than what an envelope has, take amount from here before other envelopes
 	private boolean Default;
 	
-	public Envelope(int priority, String name, double amount, int fillSetting, double fillAmount, boolean cap, double capAmount, boolean extra, boolean Default) {
+	public Envelope(int priority, String name, double amount, int fillSetting, int fillAmount, boolean cap, int capAmount, boolean extra, boolean Default) {
 		this.priority = priority;
 		this.name = name;
 		this.amount = amount;
@@ -62,7 +62,7 @@ public class Envelope {
 	/**
 	 * @return the fillAmount
 	 */
-	public double getFillAmount() {
+	public int getFillAmount() {
 		return fillAmount;
 	}
 	/**
@@ -74,7 +74,7 @@ public class Envelope {
 	/**
 	 * @return the capAmount
 	 */
-	public double getCapAmount() {
+	public int getCapAmount() {
 		return capAmount;
 	}
 	public boolean isExtra() {
@@ -110,7 +110,7 @@ public class Envelope {
 	/**
 	 * @param fillAmount the fillAmount to set
 	 */
-	public void setFillAmount(double fillAmount) {
+	public void setFillAmount(int fillAmount) {
 		this.fillAmount = fillAmount;
 	}
 	/**
@@ -122,7 +122,7 @@ public class Envelope {
 	/**
 	 * @param capAmount the capAmount to set
 	 */
-	public void setCapAmount(double capAmount) {
+	public void setCapAmount(int capAmount) {
 		this.capAmount = capAmount;
 	}
 	public void setExtra(boolean extra) {

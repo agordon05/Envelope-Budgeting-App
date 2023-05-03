@@ -17,7 +17,28 @@ public class EnvelopeAccess {
 	private static int getNextPriority() {
 		return envelopes.size() + 1;
 	}
+	
+	public static Envelope getExtraEnvelope() {
+		for(int index = 0; index < envelopes.size(); index++) {
+			if(envelopes.get(index).isExtra()) return envelopes.get(index);
+		}
+		return null;	
+	}
 
+	public static Envelope getDefaultEnvelope() {
+		for(int index = 0; index < envelopes.size(); index++) {
+			if(envelopes.get(index).isDefault()) return envelopes.get(index);
+		}
+		return null;
+	}
+	
+	public static Envelope getEnvelopeByPriority(int priority) {
+		for(int index = 0; index < envelopes.size(); index++) {
+			if(envelopes.get(index).getPriority() == priority) return envelopes.get(index);
+		}
+		return null;
+	}
+	
 	public static ArrayList<Envelope> getEnvelopes(){
 		return envelopes;
 	}

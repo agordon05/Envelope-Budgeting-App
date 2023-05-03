@@ -30,7 +30,7 @@ class StatementActionTests {
 		
 		ArrayList<StatementSplits> splits = new ArrayList<>();
 		
-		StatementActions.Transfer(response, s1, null, e2, 10);
+		StatementActions.Transfer(response, s1, null, e2.getName(), 10);
 		assertTrue(response.getErrorMessages().size() == 0, "transfer 1 should be valid");
 		splits = s1.getEnvAmount();
 		assertTrue(splits.size() == 1, "s1 should have a statement split");
@@ -39,7 +39,7 @@ class StatementActionTests {
 		assertTrue(split.amount == 10, "s1 split should have $10");
 		
 		
-		StatementActions.Transfer(response, s1, e2, e1, 10);
+		StatementActions.Transfer(response, s1, e2.getName(), e1.getName(), 10);
 		assertTrue(response.getErrorMessages().size() == 0, "transfer 2 should be valid");
 		splits = s1.getEnvAmount();
 		assertTrue(splits.size() == 1, "s1 should have only 1 statement split");
@@ -48,7 +48,7 @@ class StatementActionTests {
 		assertTrue(split.amount == 10, "s1 split should have $10");
 		
 		
-		StatementActions.Transfer(response, s2, null, e1, 65);
+		StatementActions.Transfer(response, s2, null, e1.getName(), 65);
 		assertTrue(response.getErrorMessages().size() == 0, "transfer 3 should be valid");
 		splits = s2.getEnvAmount();
 		assertTrue(splits.size() == 1, "s2 should have only 1 statement split");
@@ -57,7 +57,7 @@ class StatementActionTests {
 		assertTrue(split.amount == 65, "s1 split should have $65");
 		
 		
-		StatementActions.Transfer(response, s2, e1, e2, 60);
+		StatementActions.Transfer(response, s2, e1.getName(), e2.getName(), 60);
 		assertTrue(response.getErrorMessages().size() == 0, "transfer 4 should be valid");
 		splits = s2.getEnvAmount();
 		assertTrue(splits.size() == 2, "s2 should have 2 statement splits");
@@ -69,7 +69,7 @@ class StatementActionTests {
 		assertTrue(split.amount == 5, "s1 first split should have $5");
 		assertTrue(split2.amount == 60, "s1 second split should have $60");
 		
-		StatementActions.Transfer(response, s2, e2, null, 50);
+		StatementActions.Transfer(response, s2, e2.getName(), null, 50);
 		assertTrue(response.getErrorMessages().size() == 0, "transfer 5 should be valid");
 		splits = s2.getEnvAmount();
 		assertTrue(splits.size() == 2, "s2 should have 2 statement splits");
@@ -80,7 +80,7 @@ class StatementActionTests {
 		assertTrue(split.amount == 5, "s1 split should have $5");
 		assertTrue(split2.amount == 10, "s1 split2 should have $10");
 		
-		StatementActions.Transfer(response, s2, e2, null, 10);
+		StatementActions.Transfer(response, s2, e2.getName(), null, 10);
 		assertTrue(response.getErrorMessages().size() == 0, "transfer 6 should be valid");
 		splits = s2.getEnvAmount();
 		assertTrue(splits.size() == 1, "s2 should have only have 1 statement splits");
@@ -103,27 +103,27 @@ class StatementActionTests {
 		
 				
 		//no statement split for e1
-		StatementActions.Transfer(response, s1, e1, e2, 50);
+		StatementActions.Transfer(response, s1, e1.getName(), e2.getName(), 50);
 		assertTrue(response.getErrorMessages().size() == 1, "cannot transfer from envelope with no split");
 		assertTrue(response.getErrorMessages().get(0).equals("Invalid transfer, split statement for e1 does not exist"), "Incorrect error message");
 		assertTrue(s1.getEnvAmount().size() == 0, "there should be no statement split");
 		
 		//amount negative
-		StatementActions.Transfer(response, s1, null, e1, -20);
+		StatementActions.Transfer(response, s1, null, e1.getName(), -20);
 		assertTrue(response.getErrorMessages().size() == 2, "cannot transfer a negative amount");
 		assertTrue(response.getErrorMessages().get(1).equals("Invalid transfer, amount cannot be less than or equal to 0"), "Incorrect error message");
 		assertTrue(s1.getEnvAmount().size() == 0, "there should be no statement split");
 
 		//amount 0
-		StatementActions.Transfer(response, s1, null, e1, 0);
+		StatementActions.Transfer(response, s1, null, e1.getName(), 0);
 		assertTrue(response.getErrorMessages().size() == 3, "cannot transfer a zero amount");
 		assertTrue(response.getErrorMessages().get(2).equals("Invalid transfer, amount cannot be less than or equal to 0"), "Incorrect error message");
 		assertTrue(s1.getEnvAmount().size() == 0, "there should be no statement split");
 
 		
 		//amount above statement split
-		StatementActions.Transfer(response, s1, null, e1, 10);
-		StatementActions.Transfer(response, s1, e1, e2, 15);
+		StatementActions.Transfer(response, s1, null, e1.getName(), 10);
+		StatementActions.Transfer(response, s1, e1.getName(), e2.getName(), 15);
 		assertTrue(response.getErrorMessages().size() == 4, "cannot transfer above amount in envelope");
 		assertTrue(response.getErrorMessages().get(3).equals("Invalid transfer, insufficient funds allocated to e1 envelope"), "Incorrect error message");
 		assertTrue(s1.getEnvAmount().size() == 1, "there should be 1 statement split");
@@ -131,7 +131,7 @@ class StatementActionTests {
 		
 		
 		//amount above statement amount
-		StatementActions.Transfer(response, s2, null, e1, 110);
+		StatementActions.Transfer(response, s2, null, e1.getName(), 110);
 		assertTrue(response.getErrorMessages().size() == 5, "cannot transfer above amount in statement");
 		assertTrue(response.getErrorMessages().get(4).equals("Invalid transfer, insufficient funds in statement"), "Incorrect error message");
 		assertTrue(s2.getEnvAmount().size() == 0, "there should be no statement split");
@@ -142,7 +142,7 @@ class StatementActionTests {
 		assertTrue(response.getErrorMessages().get(5).equals("Invalid transfer, both envelopes cannot be null"), "Incorrect error message");
 
 		//statement null
-		StatementActions.Transfer(response, null, e1, e2, 20);
+		StatementActions.Transfer(response, null, e1.getName(), e2.getName(), 20);
 		assertTrue(response.getErrorMessages().size() == 7, "cannot transfer with statement being null");
 		assertTrue(response.getErrorMessages().get(6).equals("Statement does not exist"), "Incorrect error message");
 

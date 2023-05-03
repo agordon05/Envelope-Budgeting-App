@@ -18,14 +18,14 @@ public class DraftDirector {
 				response.addErrorMessage("INVALID STATEMENT REQUEST");
 				return response;
 			}
-			case "CREATE": return DraftStatement.createStatement(response, module);
-			case "REMOVE": return DraftStatement.removeStatement(response, module);
-			case "EDIT": return DraftStatement.editStatement(response, module);
-			case "MERGE": return DraftStatement.mergeStatement(response, module);
-			case "SPLIT": return DraftStatement.splitStatement(response, module);
-			case "GET": return DraftStatement.getStatement(response, module);
+			case "CREATE": DraftStatement.createStatement(response, module);
+			case "REMOVE": DraftStatement.removeStatement(response, module);
+			case "EDIT": DraftStatement.editStatement(response, module);
+//			case "MERGE": return DraftStatement.mergeStatement(response, module);
+//			case "SPLIT": return DraftStatement.splitStatement(response, module);
+			case "GET": DraftStatement.getStatement(response, module);
 		}
-
+		return response;
 	}
 	
 	public static ResponseTicket draftEnvelopeRequest(RequestTicket request, EnvelopeModule module) {
@@ -37,12 +37,12 @@ public class DraftDirector {
 				response.addErrorMessage("INVALID ENVELOPE REQUEST");
 				return response;
 			}
-			case "CREATE": return DraftEnvelope.createEnvelope(response, module);
-			case "REMOVE": return DraftEnvelope.removeEnvelope(response, module);
-			case "EDIT": return DraftEnvelope.editEnvelope(response, module);
-			case "GET": return DraftEnvelope.getEnvelope(response, module);
+			case "CREATE": DraftEnvelope.createEnvelope(response, module);
+			case "REMOVE": DraftEnvelope.removeEnvelope(response, module);
+			case "EDIT": DraftEnvelope.editEnvelope(response, module);
+			case "GET": DraftEnvelope.getEnvelope(response, module);
 		}
-
+		return response;
 	}
 	
 	public static ResponseTicket draftVendorRequest(RequestTicket request, VendorModule module) {
@@ -54,11 +54,11 @@ public class DraftDirector {
 				response.addErrorMessage("INVALID VENDOR REQUEST");
 				return response;
 			}
-			case "CREATE": return DraftVendor.createVendor(response, module);
-			case "EDIT": return DraftVendor.editVendor(response, module);
-			case "GET": return DraftVendor.getVendor(response, module);
+			case "CREATE": DraftVendor.createVendor(response, module);
+			case "EDIT": DraftVendor.editVendor(response, module);
+			case "GET": DraftVendor.getVendor(response, module);
 		}
-
+		return response;
 	}
 	
 	public static ResponseTicket draftBalanceRequest(RequestTicket request) {
@@ -69,9 +69,11 @@ public class DraftDirector {
 				response.addErrorMessage("INVALID BALANCE REQUEST");
 				return response;
 			}
-			case "GET": return DraftBalance.getBalance(response);
-			case "VALIDATE": return DraftBalance.Validate(response);
+			case "GET": DraftBalance.getBalance(response);
+			case "VALIDATE": DraftBalance.Validate(response);
 		}
+		return response;
+		
 	}
 	
 	

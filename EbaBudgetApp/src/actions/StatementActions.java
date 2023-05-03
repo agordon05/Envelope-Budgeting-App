@@ -10,7 +10,7 @@ import tickets.ResponseTicket;
 public class StatementActions {
 
 	//Transfer amount -- transfer amount from envelope 1 to envelope 2 in the statement splits
-	public static void Transfer(ResponseTicket response, Statement statement, Envelope e1, Envelope e2, double amount) {
+	public static void Transfer(ResponseTicket response, Statement statement, String e1, String e2, double amount) {
 
 		if(response == null) {
 			throw new IllegalArgumentException("Response is null");
@@ -42,14 +42,14 @@ public class StatementActions {
 		//if envelope given exists but split for it doesn't exist
 		//if split1 does not exist then there is no split to transfer from
 		if(split1 == null && e1 != null) {
-			response.addErrorMessage("Invalid transfer, split statement for " + e1.getName() + " does not exist");
+			response.addErrorMessage("Invalid transfer, split statement for " + e1 + " does not exist");
 			//removing split if its amount is 0
 			if(split2 != null && split2.amount == 0) statement.getEnvAmount().remove(split2);
 			return;
 		}
 		//if split2 does not exist then a split will be made
 		if(split2 == null && e2 != null) {
-			split2 = new StatementSplits(e2.getName(), 0);
+			split2 = new StatementSplits(e2, 0);
 			statement.getEnvAmount().add(split2);
 		}
 
@@ -71,7 +71,7 @@ public class StatementActions {
 			}
 			split2.amount += amount;
 
-			response.addInfoMessage("Allocated $" + amount + " to " + e2.getName());
+			response.addInfoMessage("Allocated $" + amount + " to " + e2);
 		}
 		//removing money from envelope
 		else if(split2 == null) {
@@ -81,7 +81,7 @@ public class StatementActions {
 				return;
 			}
 			split1.amount -= amount;
-			response.addInfoMessage("Allocated $" + amount + " from " + e1.getName());
+			response.addInfoMessage("Allocated $" + amount + " from " + e1);
 
 		}
 		//Transferring money allocated from one envelope to another
@@ -97,7 +97,7 @@ public class StatementActions {
 
 			split1.amount -= amount;
 			split2.amount += amount;
-			response.addInfoMessage("Allocated $" + amount + " to " + e2.getName() + " from " + e1.getName());
+			response.addInfoMessage("Allocated $" + amount + " to " + e2 + " from " + e1);
 
 		}
 
@@ -164,11 +164,7 @@ public class StatementActions {
 
 		return sum;
 	}
-	private static StatementSplits getSplitByEnvelope(ArrayList<StatementSplits> splits, Envelope e) {
-		if(e == null) return null;
-		return getSplitByEnvelope(splits, e.getName());
-	}
-	
+
 	
 	private static StatementSplits getSplitByEnvelope(ArrayList<StatementSplits> splits, String envelope) {
 		if(envelope == null) return null;

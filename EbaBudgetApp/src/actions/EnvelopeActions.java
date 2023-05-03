@@ -178,7 +178,7 @@ public class EnvelopeActions {
 
 
 	//changes the fillSettings in envelope
-	public static void EditSettings(ResponseTicket response, Envelope envelope, int fillSetting, double fillAmount) {
+	public static void EditSettings(ResponseTicket response, Envelope envelope, int fillSetting, int fillAmount) {
 
 		if(response == null) {
 			throw new IllegalArgumentException("Response is null");

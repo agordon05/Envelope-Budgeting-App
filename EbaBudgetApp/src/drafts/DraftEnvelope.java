@@ -5,17 +5,25 @@ import tickets.ResponseTicket;
 
 public class DraftEnvelope {
 	
-	public static ResponseTicket createEnvelope(ResponseTicket response, EnvelopeModule module) {
-		return null;
+	public static void createEnvelope(ResponseTicket response, EnvelopeModule module) {
+
 	}
-	public static ResponseTicket removeEnvelope(ResponseTicket response, EnvelopeModule module) {
-		return null;
+	
+	public static void removeEnvelope(ResponseTicket response, EnvelopeModule module) {
+
 	}	
-	public static ResponseTicket editEnvelope(ResponseTicket response, EnvelopeModule module) {
-		return null;
+	
+	public static void editEnvelope(ResponseTicket response, EnvelopeModule module) {
+
 	}	
-	public static ResponseTicket getEnvelope(ResponseTicket response, EnvelopeModule module) {
-		return null;
+	
+	public static void getEnvelope(ResponseTicket response, EnvelopeModule module) {
+
 	}
+	
+	public static void Transfer() {
+		
+	}
+	
 
 }

@@ -7,25 +7,44 @@ import dataObjects.StatementSplits;
 public class StatementModule {
 	
 	public int id;
+	
 	public String vendor;
 	public double amount;
-	public double tip;
 	public boolean pending;
-	public StatementSplits split1;
-	public StatementSplits split2;
 	public Date date;
 
+	public String envelope1;
+	public String envelope2;
 	
-	public StatementModule(int id, String vendor, double amount, double tip, boolean pending, StatementSplits split1, StatementSplits split2, Date date) {
-		this.id = id;
+
+	//CREATE
+	public StatementModule(String vendor, double amount, Date date, boolean pending) {
 		this.vendor = vendor;
 		this.amount = amount;
-		this.tip = tip;
-		this.pending = pending; 
-		this.split1 = split1;
-		this.split2 = split2;
 		this.date = date;
+		this.pending = pending;
 	}
+	
+	//REMOVE/GET
+	public StatementModule(int id) {
+		this.id = id;
+	}
+	
+	//TRANSFER
+	public StatementModule(int id, String e1, String e2, double amount) {
+		this.id = id;
+		this.envelope1 = e1;
+		this.envelope2 = e2;
+		this.amount = amount;
+	}
+	
+	//EDIT
+	public StatementModule(int id, boolean pending, double amount) {
+		this.id = id;
+		this.pending = pending;
+		this.amount = amount;
+	}
+	
 	
 
 }

@@ -1,6 +1,7 @@
 package actions;
 
 import dataObjects.Balance;
+import dataObjects.Statement;
 import tickets.ResponseTicket;
 
 public class BalanceActions {
@@ -17,6 +18,7 @@ public class BalanceActions {
 		balance.setBalance(amount);
 	}
 	
+
 	
 	
 
