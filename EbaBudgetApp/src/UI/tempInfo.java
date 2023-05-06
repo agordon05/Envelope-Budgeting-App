@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import actions.Actions;
+import actions.EnvelopeActions;
 import dataAccess.BalanceAccess;
 import dataAccess.EnvelopeAccess;
 import dataAccess.StatementAccess;
@@ -18,6 +20,7 @@ import dataObjects.Envelope;
 import dataObjects.Statement;
 import dataObjects.Vendor;
 import settings.EnvelopeSettings;
+import tickets.ResponseTicket;
 
 public class tempInfo {
 
@@ -30,8 +33,10 @@ public class tempInfo {
 	private static final String vendorSymbol = "@";
 
 	public tempInfo() {
-		Initialize();
+
 		load();
+		ResponseTicket response = Actions.validate();
+		response.printMessages();
 	}
 	
 	public void Initialize() {
@@ -85,9 +90,10 @@ public class tempInfo {
 	private void loadBalance(Scanner scanner) {
 		//get info
 		double balance = Double.parseDouble(scanner.nextLine());
-		
+		System.out.println("" + balance);
 		//create info
-		BalanceAccess.addBalance(new Balance(balance));
+		BalanceAccess.getBalance().setBalance(balance);
+		//BalanceAccess.addBalance(new Balance(balance));
 	}
 	private String loadEnvelopes(Scanner scanner) {
 		
@@ -161,7 +167,7 @@ public class tempInfo {
 	
 	
 	private static void saveBalance(BufferedWriter bw) throws IOException {
-		bw.write(BalanceAccess.getBalance().getBalance() + "\n");
+		bw.write( String.format("%.2f", BalanceAccess.getBalance().getBalance()) + "\n");
 	}
 	private static void saveEnvelopes(BufferedWriter bw) throws IOException {
 		

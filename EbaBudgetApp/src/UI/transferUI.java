@@ -14,9 +14,12 @@ import java.awt.event.KeyListener;
 
 import javax.swing.*;
 
+import actions.Actions;
 import dataAccess.EnvelopeAccess;
+import dataObjects.Envelope;
 import settings.UISettings;
 import settings.textFilters;
+import tickets.ResponseTicket;
 
 public class transferUI extends JFrame implements ActionListener, UISettings{
 
@@ -26,7 +29,7 @@ public class transferUI extends JFrame implements ActionListener, UISettings{
 
 	//components
 	private JComboBox envList;
-	private TextField amount;
+	private TextField amountText;
 	private JComboBox envList2;
 
 
@@ -83,17 +86,17 @@ public class transferUI extends JFrame implements ActionListener, UISettings{
 
 
 		//amount text field
-		amount = new TextField();
-		amount.setSize(TextboxWidth, TextboxHeight);
-		amount.setMaximumSize(new Dimension(TextboxWidth, TextboxHeight));
-		amount.setPreferredSize(new Dimension(TextboxWidth, TextboxHeight));
-		amount.addKeyListener(new KeyListener() {
+		amountText = new TextField();
+		amountText.setSize(TextboxWidth, TextboxHeight);
+		amountText.setMaximumSize(new Dimension(TextboxWidth, TextboxHeight));
+		amountText.setPreferredSize(new Dimension(TextboxWidth, TextboxHeight));
+		amountText.addKeyListener(new KeyListener() {
 
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// TODO Auto-generated method stub
 
-				textFilters.DoubleFilter(e, amount, frame);
+				textFilters.DoubleFilter(e, amountText, frame);
 
 			}
 
@@ -117,7 +120,7 @@ public class transferUI extends JFrame implements ActionListener, UISettings{
 
 
 		//envelope list 2
-		JComboBox envList2 = new JComboBox(envelopes);
+		envList2 = new JComboBox(envelopes);
 		envList2.setSelectedIndex(0);
 		envList2.setSize(dropListWidth, dropListHeight);
 		envList2.setMaximumSize(new Dimension(dropListWidth, dropListHeight));
@@ -176,7 +179,7 @@ public class transferUI extends JFrame implements ActionListener, UISettings{
 		Panel p7 = new Panel();
 		p7.setLayout(new BoxLayout(p7, BoxLayout.LINE_AXIS));
 		p7.add(Box.createHorizontalGlue());
-		p7.add(amount);
+		p7.add(amountText);
 		p7.add(Box.createHorizontalGlue());
 
 
@@ -218,8 +221,13 @@ public class transferUI extends JFrame implements ActionListener, UISettings{
 		if(envList.getSelectedItem().toString().equals(envList2.getSelectedItem().toString())) return;
 
 		//if from amount is greater than from envelope's amount -- return
+		double amount = Double.parseDouble(amountText.getText());
+		Envelope envelope = EnvelopeAccess.getEnvelopeByName(envList.getSelectedItem().toString());
+		Envelope envelope2 = EnvelopeAccess.getEnvelopeByName(envList2.getSelectedItem().toString());
+		if(amount > envelope.getAmount()) return;
 		//transfer amount
-
+		ResponseTicket response = Actions.Transfer(envelope, envelope2, amount);
+		response.printMessages();
 
 		//update
 		PrototypeUI.update();

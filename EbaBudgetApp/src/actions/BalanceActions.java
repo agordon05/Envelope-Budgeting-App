@@ -18,6 +18,13 @@ public class BalanceActions {
 		balance.setBalance(amount);
 	}
 	
+	public static void deposit(ResponseTicket response, Balance balance, double amount) {
+		balance.setBalance(balance.getBalance() + amount);
+	}
+
+	public static void withdraw(ResponseTicket response, Balance balance, double amount) {
+		balance.setBalance(balance.getBalance() - amount);
+	}
 
 	
 	

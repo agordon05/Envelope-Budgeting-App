@@ -21,6 +21,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import actions.Actions;
 import dataAccess.BalanceAccess;
 import dataAccess.EnvelopeAccess;
 import dataObjects.Envelope;
@@ -29,7 +30,7 @@ import settings.UISettings;
 
 
 
-public class PrototypeUI extends JFrame implements ActionListener, UISettings{
+public class PrototypeUI extends JFrame implements UISettings{
 
 
 	//frames
@@ -43,6 +44,7 @@ public class PrototypeUI extends JFrame implements ActionListener, UISettings{
 		
 	//components
 	private static Container container;
+	private static Panel topPanel;
 	private static Panel centerPanel;
 	private static Button edit;
 
@@ -53,8 +55,8 @@ public class PrototypeUI extends JFrame implements ActionListener, UISettings{
 		container.setLayout(new BorderLayout());
 		
 		//top panel
-		Panel p1 = createTopPanel();
-		container.add(p1, BorderLayout.NORTH);
+		topPanel = createTopPanel();
+		container.add(topPanel, BorderLayout.NORTH);
 		
 		//center panel
 		centerPanel = createCenterPanel();
@@ -80,7 +82,7 @@ public class PrototypeUI extends JFrame implements ActionListener, UISettings{
 
 	}
 	
-	private Panel createTopPanel(){
+	private static Panel createTopPanel(){
 		
 		//panel
 		Panel panel = new Panel();
@@ -89,11 +91,38 @@ public class PrototypeUI extends JFrame implements ActionListener, UISettings{
 		
 		//buttons
 		Button withdraw = new Button("Withdraw");
-		withdraw.addActionListener(this);
+		withdraw.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				disposeOtherWindows();
+				WUI = new withdrawUI();
+			}
+			
+		});
 		Button deposit = new Button("Deposit");
-		deposit.addActionListener(this);
+		deposit.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				disposeOtherWindows();
+				DUI = new depositUI();
+			}
+			
+		});
 		Button transfer = new Button("Transfer");
-		transfer.addActionListener(this);
+		transfer.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				disposeOtherWindows();
+				TUI = new transferUI();
+			}
+			
+		});
 		
 		
 		//withdraw/deposit/transfer
@@ -199,8 +228,8 @@ public class PrototypeUI extends JFrame implements ActionListener, UISettings{
 			Label name = new Label(envelope.getName());
 			
 			//amount
-			Label amount = new Label("$" + envelope.getAmount() + 
-					(envelope.hasCap() ? "/$" + envelope.getCapAmount(): ""));
+			Label amount = new Label("$" + String.format("%.2f", envelope.getAmount()) + 
+					(envelope.hasCap() ? "/$" + envelope.getCapAmount() : ""));
 			
 			//fill
 			Label fill;
@@ -219,7 +248,6 @@ public class PrototypeUI extends JFrame implements ActionListener, UISettings{
 			edit.setPreferredSize(new Dimension(editButtonWidth, editButtonHeight));
 			edit.setMaximumSize(new Dimension(editButtonWidth, editButtonHeight));
 			edit.addActionListener(new ActionListener() {
-
 				int priority = envelope.getPriority();
 				String name = envelope.getName();
 				boolean cap = envelope.hasCap();
@@ -235,7 +263,7 @@ public class PrototypeUI extends JFrame implements ActionListener, UISettings{
 					
 					
 					disposeOtherWindows();
-					EUI = new editUI(priority, name, cap, capAmount, fillSetting, fillAmount, extra, Default);
+					EUI = new editUI(envelope);
 				}
 				
 			});
@@ -255,39 +283,23 @@ public class PrototypeUI extends JFrame implements ActionListener, UISettings{
 
 	//saves info and updates center panel
 	public static void update() {
+		Actions.validate();
+		
 		tempInfo.save();
+		
+		container.remove(topPanel);
+		topPanel = createTopPanel();
+		
 		container.remove(centerPanel);
 		centerPanel = createCenterPanel();
 
+		container.add(topPanel, BorderLayout.NORTH);
 		container.add(centerPanel, BorderLayout.CENTER);
 		frame.validate();
 	}
 
 
-	//opens secondary window after disposing existing secondary windows
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
 
-		if(e.getActionCommand().equals("Withdraw")) {
-			disposeOtherWindows();
-			WUI = new withdrawUI();
-		}
-		else if(e.getActionCommand().equals("Deposit")) {
-			System.out.println("Deposit button pressed");
-			disposeOtherWindows();
-			DUI = new depositUI();
-
-		}
-		else if(e.getActionCommand().equals("Transfer")) {
-			System.out.println("Transfer button pressed");
-			disposeOtherWindows();
-			TUI = new transferUI();
-
-		}
-	
-		
-	}
 
 //gets rid of all secondary windows
 	private static void disposeOtherWindows() {

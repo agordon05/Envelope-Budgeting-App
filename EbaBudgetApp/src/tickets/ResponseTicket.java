@@ -40,6 +40,26 @@ public class ResponseTicket {
 		if(message == null) return;
 		infoMessages.add(message);
 	}
+	
+	public void printMessages() {
+		
+		System.out.println("Error messages: " + errorMessages.size());
+
+
+		for(int index = 0; index < errorMessages.size(); index++) {
+			System.out.println(errorMessages.get(index));
+		}
+		System.out.println();
+		System.out.println("Info messages: " + infoMessages.size());
+		System.out.println();
+
+		for(int index = 0; index < infoMessages.size(); index++) {
+			System.out.println(infoMessages.get(index));
+		}
+		System.out.println("\n");
+	}
+	
+	
 	/**
 	 * @return the statement
 	 */

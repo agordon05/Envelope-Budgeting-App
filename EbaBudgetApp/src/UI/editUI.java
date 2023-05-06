@@ -15,10 +15,13 @@ import java.awt.event.KeyListener;
 
 import javax.swing.*;
 
+import actions.Actions;
 import dataAccess.EnvelopeAccess;
+import dataObjects.Envelope;
 import settings.EnvelopeSettings;
 import settings.UISettings;
 import settings.textFilters;
+import tickets.ResponseTicket;
 
 public class editUI extends JFrame implements ActionListener, UISettings{
 
@@ -28,7 +31,7 @@ public class editUI extends JFrame implements ActionListener, UISettings{
 	int priority, capAmount, fillSetting, fillAmount;
 	String name;
 	boolean cap, extra, Default;
-	
+	Envelope envelope;
 	JComboBox priorityList;
 	TextField nameText;
 	Checkbox capBox;
@@ -38,16 +41,16 @@ public class editUI extends JFrame implements ActionListener, UISettings{
 	Checkbox extraBox;
 	Checkbox defaultBox;
 	
-	public editUI(int priority, String name, boolean cap, int capAmount, int fillSetting, int fillAmount, boolean extra, boolean Default) {
-
-		this.priority = priority;
-		this.name = name;
-		this.cap = cap;
-		this.capAmount = capAmount;
-		this.fillSetting = fillSetting;
-		this.fillAmount = fillAmount;
-		this.extra = extra;
-		this.Default = Default;
+	public editUI(Envelope e/*, int priority, String name, boolean cap, int capAmount, int fillSetting, int fillAmount, boolean extra, boolean Default*/) {
+		envelope = e;
+		this.priority = e.getPriority();
+		this.name = e.getName();
+		this.cap = e.hasCap();
+		this.capAmount = e.getCapAmount();
+		this.fillSetting = e.getFillSetting();
+		this.fillAmount = e.getFillAmount();
+		this.extra = e.isExtra();
+		this.Default = e.isDefault();
 		
 		
 		setup();
@@ -299,18 +302,38 @@ public class editUI extends JFrame implements ActionListener, UISettings{
 			//check user's decision
 			//remove
 			EnvelopeAccess.removeEnvelope(name);
-			PrototypeUI.update();
-			dispose();
+			
 		}
 		else if(e.getActionCommand().equals("Submit")) {
 			System.out.println("Submit button pressed");
-
+			
+			int p = Integer.parseInt(priorityList.getSelectedItem().toString());
+			String name = nameText.getText();
+			boolean cap = capBox.getState();
+			int capAmount = Integer.parseInt(capAmountText.getText());
+			int fillSetting;
+			switch(fillList.getSelectedItem().toString()) {
+				default: return;
+				case "Fill Amount": fillSetting = EnvelopeSettings.amount; break;
+				case "Fill Percentage": fillSetting = EnvelopeSettings.percentage; break;
+				case "Fill": fillSetting = EnvelopeSettings.fill; break;
+			}
+			int fillAmount = Integer.parseInt(fillAmountText.getText());
+			boolean extra = extraBox.getState();
+			boolean Default = defaultBox.getState();
+			
+			
+			ResponseTicket response = Actions.Edit(envelope, p, name, cap, capAmount, fillSetting, fillAmount, extra, Default);
+			response.printMessages();
+			
+			
 		}
 		else {
 			System.out.println(e.getActionCommand());
 		}
 		
-		
+		PrototypeUI.update();
+		dispose();
 		
 	}
 

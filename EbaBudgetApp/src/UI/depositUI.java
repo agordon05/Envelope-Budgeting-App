@@ -15,10 +15,12 @@ import java.awt.event.KeyListener;
 
 import javax.swing.*;
 
+import actions.Actions;
 import dataAccess.EnvelopeAccess;
 import dataObjects.Envelope;
 import settings.UISettings;
 import settings.textFilters;
+import tickets.ResponseTicket;
 
 public class depositUI extends JFrame implements ActionListener, UISettings{
 
@@ -158,15 +160,8 @@ public class depositUI extends JFrame implements ActionListener, UISettings{
 		//envelope
 		Envelope envelope = EnvelopeAccess.getEnvelopeByName(envList.getSelectedItem().toString());
 
-		//split amount into all envelopes
-		if(envelope == null) {
-
-		}
-		//put amount directly into envelope
-		else {
-
-		}
-
+		ResponseTicket response = Actions.Deposit(envelope, Double.parseDouble(amount.getText().toString()));
+		response.printMessages();
 
 		//update
 		PrototypeUI.update();

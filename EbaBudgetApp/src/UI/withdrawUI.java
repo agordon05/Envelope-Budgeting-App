@@ -6,6 +6,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.text.*;
 
+import actions.Actions;
 import actions.EnvelopeActions;
 import dataAccess.EnvelopeAccess;
 import dataAccess.VendorAccess;
@@ -23,7 +24,7 @@ public class withdrawUI extends JFrame implements ActionListener, UISettings {
 		
 	
 	//components
-	private TextField amount;
+	private TextField amountText;
 	private TextField name;
 	private JComboBox envelopeList;
 	
@@ -106,13 +107,13 @@ public class withdrawUI extends JFrame implements ActionListener, UISettings {
 
 
 		//amount text field
-		amount = new TextField();
-		amount.addKeyListener(new KeyListener() {
+		amountText = new TextField();
+		amountText.addKeyListener(new KeyListener() {
 
 			@Override
 			public void keyTyped(KeyEvent e) {
 				// TODO Auto-generated method stub
-				textFilters.DoubleFilter(e, amount, frame);
+				textFilters.DoubleFilter(e, amountText, frame);
 			}
 
 			@Override
@@ -158,7 +159,7 @@ public class withdrawUI extends JFrame implements ActionListener, UISettings {
 		p3.add(nameLabel);
 		p3.add(name);
 		p3.add(amountLabel);
-		p3.add(amount);
+		p3.add(amountText);
 
 
 		//add components to panel 2
@@ -196,7 +197,7 @@ public class withdrawUI extends JFrame implements ActionListener, UISettings {
 
 		//validate
 		if(name.getText().equals("")) return;
-		if(amount.getText().equals("")) return;
+		if(amountText.getText().equals("")) return;
 
 		//vendor
 		Vendor vendor = VendorAccess.getVendorByName(name.getText());
@@ -204,14 +205,11 @@ public class withdrawUI extends JFrame implements ActionListener, UISettings {
 
 
 		//withdraw		
-		ResponseTicket response = new ResponseTicket();
+		double amount = Double.parseDouble(amountText.getText());
 		Envelope envelope = EnvelopeAccess.getEnvelopeByName(envelopeList.getSelectedItem().toString());
-		EnvelopeActions.Transfer(response, envelope, null, Double.parseDouble(amount.getText()));
+		ResponseTicket response = Actions.Withdraw(name.getText(), envelope, amount);
 
-		//print error messages
-		if(response.hasErrorMessage()) {
-			System.out.println(response.getErrorMessages().get(0));
-		}
+		response.printMessages();
 
 		//update
 		PrototypeUI.update();

@@ -49,6 +49,22 @@ public class EnvelopeAccess {
 		}
 		return null;
 	}
+	
+	public static Envelope getExtra() {
+		ArrayList<Envelope> envelopes = EnvelopeAccess.getEnvelopes();
+		for(int index = 0; index < envelopes.size(); index++) {
+			if(envelopes.get(index).isExtra()) return envelopes.get(index);
+		}
+		return null;
+	}
+	
+	public static Envelope getDefault() {
+		ArrayList<Envelope> envelopes = EnvelopeAccess.getEnvelopes();
+		for(int index = 0; index < envelopes.size(); index++) {
+			if(envelopes.get(index).isDefault()) return envelopes.get(index);
+		}
+		return null;
+	}
 
 	public static Envelope addEnvelope(Envelope e) {
 		Envelope temp = new Envelope(getNextPriority(), e.getName(), e.getAmount(), e.getFillSetting(), e.getFillAmount(), e.hasCap(), e.getCapAmount(), e.isExtra(), e.isDefault());
