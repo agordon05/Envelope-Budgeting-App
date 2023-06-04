@@ -4,7 +4,7 @@ import dataObjects.Balance;
 import dataObjects.Statement;
 import tickets.ResponseTicket;
 
-public class BalanceActions {
+public class BalanceActions extends precisionOperations{
 	
 	//redundant
 	public static void setAmount(ResponseTicket response, Balance balance, double amount) {
@@ -19,11 +19,11 @@ public class BalanceActions {
 	}
 	
 	public static void deposit(ResponseTicket response, Balance balance, double amount) {
-		balance.setBalance(balance.getBalance() + amount);
+		balance.setBalance(add(balance.getBalance(), amount));
 	}
 
 	public static void withdraw(ResponseTicket response, Balance balance, double amount) {
-		balance.setBalance(balance.getBalance() - amount);
+		balance.setBalance(subtract(balance.getBalance(), amount));
 	}
 
 	

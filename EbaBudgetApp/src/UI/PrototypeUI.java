@@ -9,6 +9,7 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.Panel;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -22,11 +23,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import actions.Actions;
+import actions.precisionOperations;
 import dataAccess.BalanceAccess;
 import dataAccess.EnvelopeAccess;
 import dataObjects.Envelope;
 import settings.EnvelopeSettings;
 import settings.UISettings;
+import tickets.ResponseTicket;
 
 
 
@@ -79,7 +82,7 @@ public class PrototypeUI extends JFrame implements UISettings{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		frame.validate();
-
+		
 	}
 	
 	private static Panel createTopPanel(){
@@ -97,7 +100,7 @@ public class PrototypeUI extends JFrame implements UISettings{
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				disposeOtherWindows();
-				WUI = new withdrawUI();
+				WUI = new withdrawUI(frame.getX(), frame.getY());
 			}
 			
 		});
@@ -108,7 +111,7 @@ public class PrototypeUI extends JFrame implements UISettings{
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				disposeOtherWindows();
-				DUI = new depositUI();
+				DUI = new depositUI(frame.getX(), frame.getY());
 			}
 			
 		});
@@ -119,7 +122,7 @@ public class PrototypeUI extends JFrame implements UISettings{
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				disposeOtherWindows();
-				TUI = new transferUI();
+				TUI = new transferUI(frame.getX(), frame.getY());
 			}
 			
 		});
@@ -176,7 +179,7 @@ public class PrototypeUI extends JFrame implements UISettings{
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("Add Envelope button pressed");
 				disposeOtherWindows();
-				AUI = new addEnvelopeUI();
+				AUI = new addEnvelopeUI(frame.getX(), frame.getY());
 			}
 			
 		});
@@ -228,8 +231,21 @@ public class PrototypeUI extends JFrame implements UISettings{
 			Label name = new Label(envelope.getName());
 			
 			//amount
-			Label amount = new Label("$" + String.format("%.2f", envelope.getAmount()) + 
-					(envelope.hasCap() ? "/$" + envelope.getCapAmount() : ""));
+			Label amount;
+			//amount is a whole number
+			if( (int)(envelope.getAmount()) == envelope.getAmount() ) {
+				amount = new Label("$" + (int)envelope.getAmount() + 
+						(envelope.hasCap() ? "/$" + envelope.getCapAmount() : ""));
+			}
+			//amount is not a whole number
+			else {
+				amount = new Label("$" + String.format("%.2f", envelope.getAmount()) + 
+						(envelope.hasCap() ? "/$" + envelope.getCapAmount() : ""));
+			}
+			
+			
+			//amount
+			
 			
 			//fill
 			Label fill;
@@ -263,7 +279,7 @@ public class PrototypeUI extends JFrame implements UISettings{
 					
 					
 					disposeOtherWindows();
-					EUI = new editUI(envelope);
+					EUI = new editUI(envelope, frame.getX(), frame.getY());
 				}
 				
 			});
@@ -283,7 +299,8 @@ public class PrototypeUI extends JFrame implements UISettings{
 
 	//saves info and updates center panel
 	public static void update() {
-		Actions.validate();
+		ResponseTicket response = Actions.validate();
+		response.printMessages();
 		
 		tempInfo.save();
 		
@@ -295,7 +312,14 @@ public class PrototypeUI extends JFrame implements UISettings{
 
 		container.add(topPanel, BorderLayout.NORTH);
 		container.add(centerPanel, BorderLayout.CENTER);
+		
+		Point location = frame.getLocation();
+		
+		frame.setBounds(location.x, location.y, PUIWidth, PUIHeight + 1);
+		
 		frame.validate();
+		frame.setBounds(location.x, location.y, PUIWidth, PUIHeight);
+
 	}
 
 

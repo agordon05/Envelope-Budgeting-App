@@ -51,7 +51,7 @@ public class ResponseTicket {
 		}
 		System.out.println();
 		System.out.println("Info messages: " + infoMessages.size());
-		System.out.println();
+
 
 		for(int index = 0; index < infoMessages.size(); index++) {
 			System.out.println(infoMessages.get(index));

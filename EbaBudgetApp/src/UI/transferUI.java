@@ -34,13 +34,13 @@ public class transferUI extends JFrame implements ActionListener, UISettings{
 
 
 
-	public transferUI() {
+	public transferUI(int x, int y) {
 		setup();
 
 		//frame
 		frame = this;
 		frame.setTitle("Transfer");
-		frame.setBounds(TUIx, TUIy, TUIWidth, TUIHeight);
+		frame.setBounds(x + TUIx, y + TUIy, TUIWidth, TUIHeight);
 		frame.setAlwaysOnTop(true);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setVisible(true);
@@ -64,10 +64,10 @@ public class transferUI extends JFrame implements ActionListener, UISettings{
 
 
 		//envelope list data
-		String[] envelopes = new String[EnvelopeAccess.getEnvelopes().size() + 1];
-		envelopes[0] = "";
-		for(int index = 1; index < EnvelopeAccess.getEnvelopes().size() + 1; index++) {
-			envelopes[index] = EnvelopeAccess.getEnvelopeByPriority(index).getName();
+		String[] envelopes = new String[EnvelopeAccess.getEnvelopes().size()];
+
+		for(int index = 0; index < EnvelopeAccess.getEnvelopes().size(); index++) {
+			envelopes[index] = EnvelopeAccess.getEnvelopeByPriority(index + 1).getName();
 		}
 
 		//from label
@@ -121,7 +121,7 @@ public class transferUI extends JFrame implements ActionListener, UISettings{
 
 		//envelope list 2
 		envList2 = new JComboBox(envelopes);
-		envList2.setSelectedIndex(0);
+		envList2.setSelectedIndex(1);
 		envList2.setSize(dropListWidth, dropListHeight);
 		envList2.setMaximumSize(new Dimension(dropListWidth, dropListHeight));
 		envList2.setPreferredSize(new Dimension(dropListWidth, dropListHeight));

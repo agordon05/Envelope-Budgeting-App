@@ -44,14 +44,14 @@ public class addEnvelopeUI extends JFrame implements ActionListener, UISettings{
 	private Checkbox Default;
 
 	
-	public addEnvelopeUI() {
+	public addEnvelopeUI(int x, int y) {
 
 		setup();
 
 		//frame
 		frame = this;
 		frame.setTitle("Add Envelope");
-		frame.setBounds(AUIx, AUIy, AUIWidth, AUIHeight);
+		frame.setBounds(x + AUIx, y + AUIy, AUIWidth, AUIHeight);
 		frame.setAlwaysOnTop(true);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setVisible(true);
@@ -285,10 +285,7 @@ public class addEnvelopeUI extends JFrame implements ActionListener, UISettings{
 		default: return;
 		case "Fill Amount": fill = EnvelopeSettings.amount; break;
 		case "Fill Percentage": fill = EnvelopeSettings.percentage; break;
-		case "Fill":{
-			fill = EnvelopeSettings.fill;
-			if(!cap) return;
-		}break;
+		case "Fill": fill = EnvelopeSettings.fill; break;
 		}
 
 		

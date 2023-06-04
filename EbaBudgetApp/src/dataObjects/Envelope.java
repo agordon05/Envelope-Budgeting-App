@@ -132,7 +132,17 @@ public class Envelope {
 		this.Default = Default;
 	}
 	
-	
+	public String toString() {
+		return "\npriority: " + this.priority + 
+				"\nName: " + this.name + 
+				"\nAmount: " + this.amount + 
+				"\nFill Amount: " + this.fillAmount + 
+				"\nFill Setting: " + this.fillSetting + 
+				"\nCap: " + this.cap + 
+				"\nCap Amount: " + this.capAmount + 
+				"\nExtra: " + this.extra + 
+				"\nDefault: " + this.Default;
+	}
 	
 
 }

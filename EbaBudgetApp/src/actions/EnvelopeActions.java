@@ -141,26 +141,33 @@ public class EnvelopeActions extends precisionOperations{
 
 	}
 	
-	public static void depositIntoAllEnvelopes(ResponseTicket response, double amount) {
-		
-		//ArrayList<Envelope> envelopes = EnvelopeAccess.getEnvelopes();
-		
+	public static void depositIntoAll(ResponseTicket response, double amount) {
+				
 		
 		//deposit into those with percent fill setting
+		double fullAmount = amount;
+
 		for(int index = 1; index <= EnvelopeAccess.getEnvelopes().size(); index++) {
 			
 			Envelope envelope = EnvelopeAccess.getEnvelopeByPriority(index);
 			
-			double fullAmount = amount;
 			if(envelope.getFillSetting() == EnvelopeSettings.percentage) {
 				
-				double tempAmount = fullAmount * (double)(envelope.getFillAmount() / 100);
+				// EX: 10 / 100 = 0.1
+				double percentAmount = divide(envelope.getFillAmount(), 100);
+				
+				// EX: 500 * 0.1 = 50
+				double tempAmount = multiply(fullAmount, percentAmount);
+				
+				//deposit tempAmount
 				EnvelopeActions.deposit(response, envelope, tempAmount);
+				
+				//subtract tempAmount from amount
 				amount = subtract(amount, tempAmount);
-				//amount -= tempAmount;
+
 				response.addInfoMessage("deposited " + tempAmount + " into " + envelope.getName());
 			}
-			//System.out.println("amount left = " + amount);
+
 			if(amount == 0) return;
 		}
 		
@@ -176,21 +183,51 @@ public class EnvelopeActions extends precisionOperations{
 			switch(e.getFillSetting()) {
 				default: throw new IllegalStateException("envelope has an invalid fill setting");
 				case EnvelopeSettings.percentage: continue;
+				
 				case EnvelopeSettings.fill: {
 					
-					int capAmount = e.getCapAmount();
-					double envelopeAmount = e.getAmount();
+					//envelope has a cap
+					if(e.hasCap()) {
+
+						//get amounts needed
+						int capAmount = e.getCapAmount();
+						double envelopeAmount = e.getAmount();
+
+						//skip if envelope is full
+						if(envelopeAmount >= capAmount) continue;
+
+						//get max amount envelope can be deposited
+						amountToDeposit = subtract(capAmount, envelopeAmount);
+
+						//check if deposit amount is less than max amount
+						if(amountToDeposit > amount) amountToDeposit = amount;
+
+					}
+					//envelope does not have a cap
+					else {
+						amountToDeposit = amount;
+					}
 					
-					if(envelopeAmount >= capAmount) continue;
-					amountToDeposit = subtract(capAmount, envelopeAmount);
-					//amountToDeposit = capAmount - envelopeAmount;
-					if(amountToDeposit > amount) amountToDeposit = amount;
 					
 				} break;
+				
 				case EnvelopeSettings.amount: {
 					
 					amountToDeposit = e.getFillAmount();
+					//if envelope fill amount is greater than amount available, change amountToDeposit to amount available
 					if(amountToDeposit > amount) amountToDeposit = amount;
+					
+					//checks cap amount
+					if(e.hasCap()) {
+						
+						double amountTillFull = subtract(e.getCapAmount(), e.getAmount());
+						//if envelope is full continue
+						if(amountTillFull <= 0) continue;
+						//if amount to deposit is bigger than amount for envelope to be full, amount to deposit is the amount till full
+						if(amountToDeposit > amountTillFull) {
+							amountToDeposit = amountTillFull;
+						}
+					}
 					
 				} break;
 			}
@@ -231,173 +268,63 @@ public class EnvelopeActions extends precisionOperations{
 
 	}
 
-	
-	private static boolean lastChance = false;
-	public static boolean defaultEnvelopeCalled = false;
-
-	public static double withdrawFromDefault(ResponseTicket response, double amount) {
-		Envelope envelope = EnvelopeAccess.getDefault();
-		if(envelope != null) {
-			if(envelope.getAmount() < amount) {
-				amount = subtract(amount, envelope.getAmount());
-				amount -= envelope.getAmount();
-				withdrawal(response, envelope, envelope.getAmount());
-			}
-			else {
-				withdrawal(response, envelope, amount);
-				return 0;
-			}
+	public static double withdrawFromEnvelope(ResponseTicket response, Envelope envelope, double amount) {
+		
+		if(envelope == null) {
+			response.addInfoMessage("Cannot withdraw from envelope, envelope does not exist");
+			return amount;
 		}
+		if(amount == 0) {
+			response.addInfoMessage("Cannot withdraw $0 from " + envelope.getName());
+			return 0;
+		}
+		
+		//pointless to continue if envelope is empty
+		if(envelope.getAmount() == 0) {
+			response.addInfoMessage(envelope.getName() + " is already empty, cannot be withdrawn from");
+			return amount;
+		}
+		
+		
+		
+		//if envelope does not have enough to cover amount, withdraw what's possible
+		if(envelope.getAmount() < amount) {
+			amount = subtract(amount, envelope.getAmount());			
+			withdrawal(response, envelope, envelope.getAmount());
+		}
+		//withdraw all of the amount
+		else {
+			withdrawal(response, envelope, amount);
+			return 0;
+		}
+		
+		
 		return amount;
 	}
+
+
 	
-	
-	public static void withdrawFromAll(ResponseTicket response, Envelope envelope, double amount) {
+	public static void withdrawFromAll(ResponseTicket response, double amount) {
 
-		if(envelope == null) {
-			envelope = EnvelopeAccess.getEnvelopeByPriority(EnvelopeAccess.getEnvelopes().size());
-		}
 
-		//final algorithm in works -- from last priority to first
-		if(lastChance) {
-			response.addInfoMessage(envelope.getName() + " is in lastChance algorithm");
-			lastDraft(response, envelope, amount);
-			lastChance = false;
-		}
 
-		//envelope overdrafted
-		else if(envelope.getAmount() < amount) {
-			response.addInfoMessage(envelope.getName() + " overDrafted");
-
-			overdraft(response, envelope, amount);
+		//loop from lowest to highest priority until looped through all envelopes or until amount is 0
+		for(int index = EnvelopeAccess.getEnvelopes().size(); index > 0 && amount > 0; index--) {
+			
+			Envelope envelope = EnvelopeAccess.getEnvelopeByPriority(index);
+			
+			amount = withdrawFromEnvelope(response, envelope, amount);
+			
 		}
 		
-		//envelope did not overdraft
+		if(amount == 0)
+			response.addInfoMessage("Withdraw was successfull");
 		else {
-			response.addInfoMessage(envelope.getName() + " has $" + amount + " withdrawn");
-
-			EnvelopeActions.withdrawal(response, envelope, amount);
-			
+			response.addErrorMessage("Withdraw overdrafted account");
 		}
 		
-		lastChance = false;
-		defaultEnvelopeCalled = false;
-		
-		return;
 	}
 
-	private static void overdraft(ResponseTicket response, Envelope envelope, double amount) {
-
-
-		//withdraw all of envelopes amount
-		response.addInfoMessage("$" + envelope.getAmount() + " withdrawn from " + envelope.getName());
-		amount = subtract(amount, envelope.getAmount());
-		//amount -= envelope.getAmount();
-		EnvelopeActions.withdrawal(response, envelope, envelope.getAmount());
-		response.addInfoMessage(amount + " is still waiting to be withdrawn");
-
-
-		if(defaultEnvelopeCalled) {
-			response.addInfoMessage("last chance algorithm starts");
-			lastChance = true;
-			defaultEnvelopeCalled = false;
-			
-			Envelope defaultEnvelope = EnvelopeAccess.getEnvelopeByPriority(EnvelopeAccess.getEnvelopes().size());
-			response.addInfoMessage("default envelope: " + defaultEnvelope.getName() + " is being withdrawn $" + amount);
-			withdrawFromAll(response, defaultEnvelope, amount);
-			return;
-		}
-
-		if(lastChance) {
-			
-			Envelope prevE = EnvelopeAccess.getEnvelopeByPriority(envelope.getPriority() - 1);
-			response.addInfoMessage("Previous envelope called: " + (prevE == null? "Null": prevE.getName()));
-
-			if(prevE == null) {
-				response.addInfoMessage("ACCOUNT HAS OVERDRAFTED!");
-				return;
-			}
-			
-			response.addInfoMessage("previous envelope: " + prevE.getName() + " is being withdrawn $" + amount);
-			withdrawFromAll(response, prevE, amount);
-			return;
-
-		}
-
-		//next priority envelope
-		Envelope np = EnvelopeAccess.getEnvelopeByPriority(envelope.getPriority() + 1);
-		
-		//there is no next priority
-		if(np == null) {
-
-			response.addInfoMessage("Next envelope is null, getting default envelope");
-			
-			Envelope Default = EnvelopeAccess.getDefault();
-			
-			//start last chance algorithm
-			if(Default == null || Default.getAmount() == 0) {
-				response.addInfoMessage("default envelope is null or empty, last chance algorithm starts");
-				
-				lastChance = true;
-				
-				//last chance algorithm starting from last priority envelope
-				Envelope e = EnvelopeAccess.getEnvelopeByPriority(EnvelopeAccess.getEnvelopes().size());
-				response.addInfoMessage("Last envelope: " + e.getName() + " is being withdrawn $" + amount);
-				withdrawFromAll(response, e, amount);
-				return;
-			}
-
-			response.addInfoMessage("Extra envelope: " + Default.getName() + " is called");
-			defaultEnvelopeCalled = true;
-			np = Default;
-		}
-		//there is a next priority	
-		response.addInfoMessage("Next envelope: " + np.getName() + " is being withdrawn $" + amount);
-		withdrawFromAll(response, np, amount);
-
-	}
-
-
-
-
-	//used when overdraft method fails to resolve an expensive purchase requiring multiple envelopes
-	//works by moving from last priority to first
-	private static void lastDraft(ResponseTicket response, Envelope envelope, double amount) {
-
-		response.addInfoMessage("Last draft algorithm called for " + envelope.getName());;
-
-		//this envelope is empty
-		if(envelope.getAmount() == 0) {
-			Envelope prevE = EnvelopeAccess.getEnvelopeByPriority(envelope.getPriority() - 1);
-			response.addInfoMessage("Envelope " + envelope.getName() + " is empty, previous envelope is " + (prevE == null? "null" : prevE.getName()));
-			
-			if(prevE == null) {
-				response.addInfoMessage("ACCOUNT HAS OVERDRAFTED!");
-				return;
-			}
-
-			response.addInfoMessage("Previous envelope " + prevE.getName() + " is being withdrawn $" + amount);
-			withdrawFromAll(response, prevE, amount);
-
-		}
-
-		//this envelope did overdraft
-		else if(envelope.getAmount() < amount) {
-			response.addInfoMessage("envelope " + envelope.getName() + " overdrafted");
-			overdraft(response, envelope, amount);		
-		}
-
-		//this envelope did not overdraft
-		else {
-			response.addInfoMessage("No Overdraft! envelope: " + envelope.getName() + " -- amount: " + amount);
-			EnvelopeActions.withdrawal(response, envelope, amount);
-			return;
-		}
-	}
-
-
-		
-	
 	
 
 	//changes the fillSettings in envelope

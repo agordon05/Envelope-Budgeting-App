@@ -41,7 +41,7 @@ public class editUI extends JFrame implements ActionListener, UISettings{
 	Checkbox extraBox;
 	Checkbox defaultBox;
 	
-	public editUI(Envelope e/*, int priority, String name, boolean cap, int capAmount, int fillSetting, int fillAmount, boolean extra, boolean Default*/) {
+	public editUI(Envelope e, int x, int y) {
 		envelope = e;
 		this.priority = e.getPriority();
 		this.name = e.getName();
@@ -58,7 +58,7 @@ public class editUI extends JFrame implements ActionListener, UISettings{
 		//frame
 		frame = this;
 		frame.setTitle("Edit");
-		frame.setBounds(EUIx, EUIy, EUIWidth, EUIHeight);
+		frame.setBounds(x + EUIx, y + EUIy, EUIWidth, EUIHeight);
 		frame.setAlwaysOnTop(true);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setVisible(true);

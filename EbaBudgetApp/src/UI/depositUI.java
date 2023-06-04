@@ -33,14 +33,14 @@ public class depositUI extends JFrame implements ActionListener, UISettings{
 	private TextField amount;
 
 	
-	public depositUI() {
+	public depositUI(int x, int y) {
 		
 		setup();
 
 		//frame
 		frame = this;
 		frame.setTitle("Deposit");
-		frame.setBounds(DUIx, DUIy, DUIWidth, DUIHeight);
+		frame.setBounds(x + DUIx, y + DUIy, DUIWidth, DUIHeight);
 		frame.setAlwaysOnTop(true);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setVisible(true);

@@ -32,12 +32,6 @@ public class tempInfo {
 	private static final String statementSplitSymbol = "!";
 	private static final String vendorSymbol = "@";
 
-	public tempInfo() {
-
-		load();
-		ResponseTicket response = Actions.validate();
-		response.printMessages();
-	}
 	
 	public void Initialize() {
 		EnvelopeAccess.Initialize();
@@ -47,8 +41,21 @@ public class tempInfo {
 		BalanceAccess.addBalance(new Balance(0));
 	}
 	
+	public tempInfo() {
+
+		load();
+		
+		System.out.println("Validating Envelopes");
+		ResponseTicket response = Actions.validate();
+		response.printMessages();
+		
+	}
+	
+
+	
 
 	public void load() {
+		
 		//reset dataAccess
 		Initialize();
 		
@@ -65,12 +72,11 @@ public class tempInfo {
 			if(file.exists()) {
 				
 				Scanner scanner = new Scanner(file);
-				
+
 				//load Objects
 				loadBalance(scanner);
 				String currentLine = loadEnvelopes(scanner);
-				
-				
+
 				scanner.close();
 				
 			}
@@ -90,10 +96,10 @@ public class tempInfo {
 	private void loadBalance(Scanner scanner) {
 		//get info
 		double balance = Double.parseDouble(scanner.nextLine());
-		System.out.println("" + balance);
+		System.out.println("Balance loaded: $" + balance);
+		
 		//create info
 		BalanceAccess.getBalance().setBalance(balance);
-		//BalanceAccess.addBalance(new Balance(balance));
 	}
 	private String loadEnvelopes(Scanner scanner) {
 		
@@ -119,6 +125,7 @@ public class tempInfo {
 			
 			//create envelope
 			Envelope e = new Envelope(priority, name, amount, fillSetting, fillAmount, cap, capAmount, extra, Default);
+			System.out.println("Envelope loaded: " + e.toString() + "\n");
 			EnvelopeAccess.addEnvelope(e);
 		}
 		
@@ -126,15 +133,15 @@ public class tempInfo {
 	}
 	
 	/*TO BE WRITTEN*/
-	private void loadStatements(Scanner scanner, String currentLine) {
-
-	}
-	private void loadStatementSplits(Scanner scanner, String currentLine) {
-
-	}
-	private void loadVendors(Scanner scanner, String currentLine) {
-
-	}
+//	private void loadStatements(Scanner scanner, String currentLine) {
+//
+//	}
+//	private void loadStatementSplits(Scanner scanner, String currentLine) {
+//
+//	}
+//	private void loadVendors(Scanner scanner, String currentLine) {
+//
+//	}
 	
 	
 	
@@ -152,9 +159,9 @@ public class tempInfo {
 			//save objects
 			saveBalance(bw);
 			saveEnvelopes(bw);
-			saveStatements(bw);
-			saveStatementSplits(bw);
-			saveVendors(bw);
+//			saveStatements(bw);
+//			saveStatementSplits(bw);
+//			saveVendors(bw);
 			
 			bw.newLine();
 			bw.close();
@@ -188,39 +195,39 @@ public class tempInfo {
 			
 		}
 	}
-	static char statementSymbol = '$';
-	private static void saveStatements(BufferedWriter bw) throws IOException {
-		for(int index = 0; index < StatementAccess.getStatements().size(); index++) {
-			Statement s = StatementAccess.getStatementByID(index + 1);
-			
-			String statementString = s.getID() + statementSymbol +
-					s.getName() + statementSymbol +
-					s.getVendor() + statementSymbol +
-					s.getAmount() + statementSymbol +
-					s.getTip() + statementSymbol +
-					s.isPending() + "\n";
-			
-			bw.write(statementString);
-			
-		}
-	}
-	/* --TO BE WRITTEN--*/
-	private static void saveStatementSplits(BufferedWriter bw) throws IOException {
-		
-	}
-	
-	private static void saveVendors(BufferedWriter bw) throws IOException {
-		
-		for(int index = 0; index < VendorAccess.getVendors().size(); index++) {
-			Vendor v = VendorAccess.getVendors().get(index);
-			
-			String statementString = v.getName() + vendorSymbol +
-					v.getPrefName() + vendorSymbol +
-					v.getPrefEnvelope() + "\n";
-			bw.write(statementString);
-			
-		}
-	}
+//	static char statementSymbol = '$';
+//	private static void saveStatements(BufferedWriter bw) throws IOException {
+//		for(int index = 0; index < StatementAccess.getStatements().size(); index++) {
+//			Statement s = StatementAccess.getStatementByID(index + 1);
+//			
+//			String statementString = s.getID() + statementSymbol +
+//					s.getName() + statementSymbol +
+//					s.getVendor() + statementSymbol +
+//					s.getAmount() + statementSymbol +
+//					s.getTip() + statementSymbol +
+//					s.isPending() + "\n";
+//			
+//			bw.write(statementString);
+//			
+//		}
+//	}
+//	/* --TO BE WRITTEN--*/
+//	private static void saveStatementSplits(BufferedWriter bw) throws IOException {
+//		
+//	}
+//	
+//	private static void saveVendors(BufferedWriter bw) throws IOException {
+//		
+//		for(int index = 0; index < VendorAccess.getVendors().size(); index++) {
+//			Vendor v = VendorAccess.getVendors().get(index);
+//			
+//			String statementString = v.getName() + vendorSymbol +
+//					v.getPrefName() + vendorSymbol +
+//					v.getPrefEnvelope() + "\n";
+//			bw.write(statementString);
+//			
+//		}
+//	}
 	
 	
 	private void createFile(File file) throws Exception{

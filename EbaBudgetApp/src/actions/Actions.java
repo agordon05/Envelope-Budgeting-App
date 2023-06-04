@@ -19,8 +19,11 @@ public class Actions extends precisionOperations{
 		response.addInfoMessage("validate action called");
 
 		//formatting balance
-		int tempBalance = (int)(BalanceAccess.getBalance().getBalance() * 100);
-		double amount = (double)(tempBalance / 100.0);
+		int tempBalance = (int)(multiply(BalanceAccess.getBalance().getBalance(), 100));
+		double amount = divide(tempBalance, 100.0);
+		response.addInfoMessage("Formatted balance, was $" + BalanceAccess.getBalance().getBalance() + " and is now $" + amount);
+		BalanceAccess.getBalance().setBalance(amount);
+		
 		
 		ArrayList<Envelope> envelopes = EnvelopeAccess.getEnvelopes();
 		
@@ -29,46 +32,63 @@ public class Actions extends precisionOperations{
 		
 		//formatting envelope amounts
 		for(int index = 0; index < envelopes.size(); index++) {
+			
+			
 			double checkAmount = envelopes.get(index).getAmount();
-			int tempAmount = (int)(envelopes.get(index).getAmount() * 100);
-			envelopes.get(index).setAmount((double)(tempAmount / 100.0));	
+			
+			int tempAmount = (int)(multiply(envelopes.get(index).getAmount(), 100));
+			envelopes.get(index).setAmount(divide(tempAmount, 100));
 			
 			//discrepancy found
-			if(checkAmount != envelopes.get(index).getAmount()) check = true;
+			if(checkAmount != envelopes.get(index).getAmount()) {
+				response.addInfoMessage("Envelope " + envelopes.get(index).getName() + "'s amount had a discrepancy");
+				response.addInfoMessage("\t was " + checkAmount + " and is now " + envelopes.get(index).getAmount());
+				check = true;
+			}
+				
 		}
+		
 		
 		//formatting envelopes -- validating balance
 		for(int index = 0; index < envelopes.size(); index++) {
-			if(envelopes.get(index).getAmount() < 0) envelopes.get(index).setAmount(0);
-//			System.out.println("amount -- " + amount + " -- envelope: " + envelopes.get(index).getName() + " -- envelope amount: " + envelopes.get(index).getAmount() );
+			if(envelopes.get(index).getAmount() < 0) {
+				response.addInfoMessage(envelopes.get(index).getName() + "'s amount was less than 0, setting to 0");
+				envelopes.get(index).setAmount(0);
+			}
 			
-			//amount = BigDecimal.valueOf(amount).subtract(BigDecimal.valueOf(envelopes.get(index).getAmount())).doubleValue();
+			response.addInfoMessage("subtracting $" + envelopes.get(index).getAmount() + " from " + envelopes.get(index).getName() + " from remaining balance");
 			amount = subtract(amount, envelopes.get(index).getAmount());
-			/*IS NOT PRECISE ENOUGH FOR CALCULATION*/
-			//amount -= envelopes.get(index).getAmount();
+			response.addInfoMessage("remaining balance is $" + amount);
 			
-//			System.out.println("amount -- " + amount + " -- envelope: " + envelopes.get(index).getName() + " -- envelope amount: " + envelopes.get(index).getAmount() );
 		}
+		
 		
 		//balance does not match with envelope balances
 		if(amount < 0) {
 			amount = Math.abs(amount);
-			response.addErrorMessage("Account validation failed. Removing extra");
+			response.addErrorMessage("Account validation failed. Removing extra amount: $" + amount);
 			//start withdraw algorithm from last priority
 			check = true;
-			EnvelopeActions.defaultEnvelopeCalled = true;
-			EnvelopeActions.withdrawFromAll(response, EnvelopeAccess.getDefault(), amount);
+			
+			amount = EnvelopeActions.withdrawFromEnvelope(response, EnvelopeAccess.getDefault(), amount);
+			EnvelopeActions.withdrawFromAll(response, amount);
+
 		}
+		
 		
 		//balance does not match with envelope balances
 		else if(amount > 0) {
 			response.addErrorMessage("Account validation failed. adding unnaccounted funds");
 			EnvelopeActions.deposit(response, EnvelopeAccess.getEnvelopeByPriority(1), amount);
+			
 			check = true;
 		}
 		
 		//if discrepancy found, save
-		if(check) tempInfo.save();
+		if(check) {
+			response.addInfoMessage("Saving new info");
+			tempInfo.save();
+		}
 		
 		return response;
 	}
@@ -79,28 +99,27 @@ public class Actions extends precisionOperations{
 		
 		response.addInfoMessage("withdraw action called");
 
-		//currently only one balance is used
-		Balance balance = BalanceAccess.getBalance();
-				
 		if(amount <= 0) {
 			response.addErrorMessage("amount cannot be less than or equal to 0");
 			return response;
 		}
 		
-		//withdraw starting from default envelope
-		if(envelope == null) {
-			response.addInfoMessage("Withdrawing $" + amount + " from default envelope");
-			amount = EnvelopeActions.withdrawFromDefault(response, amount);
-			Envelope e = EnvelopeAccess.getEnvelopeByPriority(EnvelopeAccess.getEnvelopes().size());
-			EnvelopeActions.withdrawFromAll(response, e, amount);
-		}
-		//withdraw starting from envelope given
-		else {
-			response.addInfoMessage("Withdrawing $" + amount + " from " + envelope.getName());
-			EnvelopeActions.withdrawFromAll(response, envelope, amount);
-		}
-		
+		//currently only one balance is used
+		Balance balance = BalanceAccess.getBalance();
 		BalanceActions.withdraw(response, balance, amount);
+	
+		
+		
+		
+		
+		//withdraw from envelope given
+		amount = EnvelopeActions.withdrawFromEnvelope(response, envelope, amount);
+		//withdraw from Default envelope
+		amount = EnvelopeActions.withdrawFromEnvelope(response, EnvelopeAccess.getDefault(), amount);
+		//withdraw from all starting from lowest priority
+		EnvelopeActions.withdrawFromAll(response, amount);
+		
+		
 		
 		return response;
 		
@@ -115,6 +134,8 @@ public class Actions extends precisionOperations{
 
 		//currently only one balance is used
 		Balance balance = BalanceAccess.getBalance();
+		BalanceActions.deposit(response, balance, amount);
+
 		
 		if(amount <= 0) {
 			response.addErrorMessage("amount cannot be less than or equal to 0");
@@ -123,14 +144,14 @@ public class Actions extends precisionOperations{
 		
 		if(e == null) {
 			response.addInfoMessage("Depositing $" + amount + " into all envelopes");
-			EnvelopeActions.depositIntoAllEnvelopes(response, amount);		
+			EnvelopeActions.depositIntoAll(response, amount);		
 		}
 		else {
 			response.addInfoMessage("Depositing $" + amount + " into " + e.getName());
-			EnvelopeActions.Transfer(response, null, e, amount);
+			//EnvelopeActions.Transfer(response, null, e, amount);
+			EnvelopeActions.deposit(response, e, amount);
 		}
 		
-		BalanceActions.deposit(response, balance, amount);
 		
 		return response;
 	}
@@ -149,24 +170,11 @@ public class Actions extends precisionOperations{
 
 		
 		
-		if(e1 == null && e2 == null) {
-			response.addErrorMessage("Both envelopes cannot be null");
+		if(e1 == null || e2 == null) {
+			response.addErrorMessage("Envelopes cannot be null");
 			return response;
 		}
 		
-		if(e1 == null) {
-			response.addInfoMessage("checking for amounts outside of envelopes");
-			double unaccountedFunds = getUnaccountedFunds();
-			
-			if(amount > unaccountedFunds) {
-				response.addErrorMessage("amount is greater than unaccounted funds");
-				return response;
-			}
-			
-			EnvelopeActions.deposit(response, e2, amount);
-			
-			return response;
-		}
 		
 		if(amount > e1.getAmount()) {
 			response.addErrorMessage("Envelope does not have sufficient funds for transfer");
@@ -174,34 +182,12 @@ public class Actions extends precisionOperations{
 		}
 		
 		
-		if(e2 == null) {
-			response.addInfoMessage("removing amount from envelope");
-			EnvelopeActions.withdrawal(response, e2, amount);
-			return response;
-		}
-		
 
 		EnvelopeActions.Transfer(response, e1, e2, amount);
 		
 		return response;
 	}
-	
-	
-	private static double getUnaccountedFunds() {
 		
-		double amount = BalanceAccess.getBalance().getBalance();
-		ArrayList<Envelope> envelopes = EnvelopeAccess.getEnvelopes();
-		for(int index = 0; index < envelopes.size(); index++) {
-			amount -= envelopes.get(index).getAmount();
-		}
-		if(amount < 0) {
-			throw new IllegalStateException("Envelopes have more funds than balance"); 
-		}
-		
-		return amount;
-	}
-	
-	
 	
 	public static ResponseTicket Edit(Envelope e, int priority, String name, boolean cap, int capAmount, int fillSetting, int fillAmount, boolean extra, boolean Default) {
 		
@@ -259,14 +245,17 @@ public class Actions extends precisionOperations{
 			} break;
 			case EnvelopeSettings.percentage: {
 				int percentage = EnvelopeActions.getTotalFillPercentage(temp);
+				//total percantage used for envelopes is 100%
 				if(percentage == 100) {
 					response.addErrorMessage("Envelope Edit -- Invalid percentage, total percentage used by other envelopes is 100%");
 					return response;
 				}
-				if(fillAmount > percentage) {
-					response.addErrorMessage("Envelope Edit -- Invalid percentage, cannot be greater than " + percentage);
+				//total percentage used for envelopes is not 100%, but the fill amount given will make it more than 100%
+				if(fillAmount > (100 - percentage)) {
+					response.addErrorMessage("Envelope Edit -- Invalid percentage, cannot be greater than " + (100 - percentage));
 					return response;
 				}
+				//fill amount cannot be less than 0
 				if(fillAmount < 0) {
 					response.addErrorMessage("Envelope Edit -- Invalid percentage, cannot be less than 0");
 					return response;
