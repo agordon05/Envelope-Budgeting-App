@@ -16,5 +16,5 @@ Under the envelopes is an add envelope button. This button allows the user to cr
 Envelopes cannot have the same name.
 If a window doesn't close when clicking the submit button. Either information is missing or their is a conflict with the information given
 
-# How to install and run
-This project is run using JavaSE-15, Swing and AWT. There is not an executable file to run the application. The main method is inside the PrototypeUI class in the UI package.
+# How to run
+This project is run using JavaSE-15, Swing and AWT. The main method is inside the PrototypeUI class in the UI package. This project has an Executable Jar file called EbaPrototype.jar. This project will run automatically by opening that file. However, by using that jar file, any changes you make will **not** be saved for later use.
