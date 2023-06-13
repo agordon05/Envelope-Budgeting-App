@@ -1,0 +1,12 @@
+430.76
+1#Savings#0.0#2#10#false#0#false#false
+2#Gas#100.0#1#0#true#100#false#false
+3#Groceries#148.13#1#0#true#160#false#false
+4#Holdings#18.63#1#0#true#300#false#true
+5#Personal#0.0#3#40#true#100#false#false
+6#Puppy Expenses#98.0#3#70#true#200#false#false
+7#Maintenance#40.0#3#10#true#500#false#false
+8#Vape#26.0#3#20#true#50#false#false
+9#Haircut#0.0#3#5#true#30#false#false
+10#Motorcycle#0.0#1#0#false#0#true#false
+

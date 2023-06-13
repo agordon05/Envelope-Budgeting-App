@@ -221,7 +221,11 @@ public class PrototypeUI extends JFrame implements UISettings{
 			Envelope envelope = EnvelopeAccess.getEnvelopeByPriority(index + 1);
 			
 			//priority
-			Label priority = new Label("\t" + envelope.getPriority());
+			Label priority;
+			if(envelope.getFillSetting() == EnvelopeSettings.percentage) {
+				priority = new Label("\t-");
+			}
+			else priority = new Label("\t" + envelope.getPriority());
 			priority.setSize(5, 5);
 			priority.setPreferredSize(new Dimension(5, 5));
 			priority.setMaximumSize(new Dimension(5, 5));

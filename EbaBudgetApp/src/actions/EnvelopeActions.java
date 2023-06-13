@@ -144,9 +144,9 @@ public class EnvelopeActions extends precisionOperations{
 	public static void depositIntoAll(ResponseTicket response, double amount) {
 				
 		
-		//deposit into those with percent fill setting
 		double fullAmount = amount;
-
+		
+		//deposit into those with percent fill setting
 		for(int index = 1; index <= EnvelopeAccess.getEnvelopes().size(); index++) {
 			
 			Envelope envelope = EnvelopeAccess.getEnvelopeByPriority(index);
@@ -158,6 +158,10 @@ public class EnvelopeActions extends precisionOperations{
 				
 				// EX: 500 * 0.1 = 50
 				double tempAmount = multiply(fullAmount, percentAmount);
+				
+				//format temp amount
+				int formattedAmount = (int)multiply(tempAmount, 100);
+				tempAmount = divide(formattedAmount, 100);
 				
 				//deposit tempAmount
 				EnvelopeActions.deposit(response, envelope, tempAmount);
@@ -242,7 +246,7 @@ public class EnvelopeActions extends precisionOperations{
 		}
 		
 		
-		//deposit left over amount into envelope marked extra if there is one
+		//deposit left over amount into envelope marked extra if there is one, otherwise validate will put it into the 1st priority envelope
 		ArrayList<Envelope> envelopes = EnvelopeAccess.getEnvelopes();
 		for(int index = 0; index < envelopes.size(); index++) {
 			if(!envelopes.get(index).isExtra()) continue;
