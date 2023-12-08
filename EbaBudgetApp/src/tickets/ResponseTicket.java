@@ -11,7 +11,10 @@ public class ResponseTicket {
 	private ArrayList<String> errorMessages = new ArrayList<>();
 	private ArrayList<String> infoMessages = new ArrayList<>();
 	
-	
+	public void add(ResponseTicket response) {
+		errorMessages.addAll(response.getErrorMessages());
+		infoMessages.addAll(response.getInfoMessages());
+	}
 	
 	public boolean hasErrorMessage() {
 		if(errorMessages.size() == 0) return false;

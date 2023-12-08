@@ -1,26 +1,10 @@
 package UI;
 
-import java.awt.BorderLayout;
-import java.awt.Button;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.GridLayout;
-import java.awt.Label;
-import java.awt.Panel;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.*;
+import java.awt.event.*;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+
+import javax.swing.*;
 
 import actions.Actions;
 import actions.precisionOperations;
@@ -47,8 +31,17 @@ public class PrototypeUI extends JFrame implements UISettings{
 		
 	//components
 	private static Container container;
-	private static Panel topPanel;
-	private static Panel centerPanel;
+	//top panels
+	private static Panel topPanel = new Panel();
+	private static Panel buttonPanel = new Panel();
+	private static Panel balancePanel = new Panel();
+	
+	//center panels
+	private static Panel centerPanel = new Panel();
+	private static Panel addEnvPanel = new Panel();
+	private static Panel bodyPanel = new Panel();
+
+
 	private static Button edit;
 
 	public PrototypeUI() {
@@ -58,11 +51,11 @@ public class PrototypeUI extends JFrame implements UISettings{
 		container.setLayout(new BorderLayout());
 		
 		//top panel
-		topPanel = createTopPanel();
+		createTopPanel();
 		container.add(topPanel, BorderLayout.NORTH);
 		
 		//center panel
-		centerPanel = createCenterPanel();
+		createCenterPanel();
 		container.add(centerPanel, BorderLayout.CENTER);
 
 
@@ -81,15 +74,22 @@ public class PrototypeUI extends JFrame implements UISettings{
 		frame.setBounds(PUIx, PUIy, PUIWidth, PUIHeight);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
+		frame.setResizable(false);
 		frame.validate();
+		
+		updateUI();
+//		updateFrame();
 		
 	}
 	
-	private static Panel createTopPanel(){
-		
+
+	
+	private static void createTopPanel(){
+		removeAll(topPanel);
+		removeAll(buttonPanel);
+		removeAll(balancePanel);
 		//panel
-		Panel panel = new Panel();
-		panel.setLayout(new GridLayout(2,1,1,1));
+		topPanel.setLayout(new GridLayout(2,1,1,1));
 
 		
 		//buttons
@@ -129,41 +129,37 @@ public class PrototypeUI extends JFrame implements UISettings{
 		
 		
 		//withdraw/deposit/transfer
-		Panel p2 = new Panel();
-		p2.setLayout(new GridLayout(1,3,1,1));
-		p2.add(withdraw);
-		p2.add(deposit);
-		p2.add(transfer);
-		
+		buttonPanel.setLayout(new GridLayout(1,3,1,1));
+		buttonPanel.add(withdraw);
+		buttonPanel.add(deposit);
+		buttonPanel.add(transfer);
+		validate(buttonPanel);
 		
 		//Balance label
-		Panel p3 = new Panel();
 		Label balance = new Label("Balance: $" + String.format("%.2f", BalanceAccess.getBalance().getBalance()));
-		p3.add(Box.createHorizontalGlue());
-		p3.add(balance);
-		p3.add(Box.createHorizontalGlue());
-		
+		balancePanel.add(Box.createHorizontalGlue());
+		balancePanel.add(balance);
+		balancePanel.add(Box.createHorizontalGlue());
+		validate(balancePanel);
 		
 		//add components to panel
-		panel.add(p2);
-		panel.add(p3);
+		topPanel.add(buttonPanel);
+		topPanel.add(balancePanel);
 		
 		
 		//validate
-		panel.validate();
-		
-		return panel;
+		validate(topPanel);		
 	}
 	
 	
-	
-	private static Panel createCenterPanel() {
-		
+	private static void createCenterPanel() {
+		removeAll(centerPanel);
 		//panel
-		Panel panel = new Panel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-		panel.setBackground(Color.gray);		
-		panel.add(createBody());
+		centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.PAGE_AXIS));
+		centerPanel.setBackground(Color.gray);
+		
+		createBody();
+		centerPanel.add(bodyPanel);
 		
 		
 		
@@ -185,33 +181,31 @@ public class PrototypeUI extends JFrame implements UISettings{
 		});
 		
 		if(EnvelopeAccess.getEnvelopes().size() < 10) {
+			removeAll(addEnvPanel);
 			//panel 2
-			Panel p2 = new Panel();
-			p2.setLayout(new BoxLayout(p2, BoxLayout.LINE_AXIS));
-			p2.add(Box.createHorizontalGlue());
-			p2.add(addEnvelope);
-			p2.add(Box.createHorizontalGlue());
+			addEnvPanel.setLayout(new BoxLayout(addEnvPanel, BoxLayout.LINE_AXIS));
+			addEnvPanel.add(Box.createHorizontalGlue());
+			addEnvPanel.add(addEnvelope);
+			addEnvPanel.add(Box.createHorizontalGlue());
+			validate(addEnvPanel);
 
 			//add components to panel
-			panel.add(p2);
-			panel.add(Box.createVerticalGlue());
+			centerPanel.add(addEnvPanel);
+			centerPanel.add(Box.createVerticalGlue());
 		}
-		panel.validate();
 		
-		return panel;
+		validate(centerPanel);
 	}
 
-	
-	private static Panel createBody() {
+	private static void createBody() {
 		
 		int numOfEnvelopes = EnvelopeAccess.getEnvelopes().size();
-
+		removeAll(bodyPanel);
 		//panel
-		Panel panel = new Panel();
-		panel.setLayout(new GridLayout(EnvelopeAccess.getEnvelopes().size(),5,0,0));
-		panel.setSize(PUIWidth, envelopeHeight * numOfEnvelopes);
-		panel.setMaximumSize(new Dimension(PUIWidth, envelopeHeight * maxNumOfEnvelopes));
-		panel.setPreferredSize(new Dimension(PUIWidth, envelopeHeight * numOfEnvelopes));
+		bodyPanel.setLayout(new GridLayout(EnvelopeAccess.getEnvelopes().size(),5,0,0));
+		bodyPanel.setSize(PUIWidth, envelopeHeight * numOfEnvelopes);
+		bodyPanel.setMaximumSize(new Dimension(PUIWidth, envelopeHeight * maxNumOfEnvelopes));
+		bodyPanel.setPreferredSize(new Dimension(PUIWidth, envelopeHeight * numOfEnvelopes));
 		
 		
 		//create row for each existing envelope
@@ -268,15 +262,7 @@ public class PrototypeUI extends JFrame implements UISettings{
 			edit.setPreferredSize(new Dimension(editButtonWidth, editButtonHeight));
 			edit.setMaximumSize(new Dimension(editButtonWidth, editButtonHeight));
 			edit.addActionListener(new ActionListener() {
-				int priority = envelope.getPriority();
-				String name = envelope.getName();
-				boolean cap = envelope.hasCap();
-				int capAmount = envelope.getCapAmount();
-				int fillSetting = envelope.getFillSetting();
-				int fillAmount = envelope.getFillAmount();
-				boolean extra = envelope.isExtra();
-				boolean Default = envelope.isDefault();
-				
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
@@ -290,14 +276,14 @@ public class PrototypeUI extends JFrame implements UISettings{
 
 
 			//add components to panel
-			panel.add(priority);
-			panel.add(name);
-			panel.add(amount);
-			panel.add(fill);
-			panel.add(edit);
+			bodyPanel.add(priority);
+			bodyPanel.add(name);
+			bodyPanel.add(amount);
+			bodyPanel.add(fill);
+			bodyPanel.add(edit);
 			
 		}
-		return panel;
+		validate(bodyPanel);
 	}
 
 
@@ -308,28 +294,41 @@ public class PrototypeUI extends JFrame implements UISettings{
 		
 		tempInfo.save();
 		
-		container.remove(topPanel);
-		topPanel = createTopPanel();
-		
-		container.remove(centerPanel);
-		centerPanel = createCenterPanel();
+		updateFrame();
 
+	}
+	
+	public static void updateFrame() {
+		// remove and validate
+		container.remove(topPanel);
+		container.remove(centerPanel);
+		container.validate();
+		container.repaint();
+		
+		// recreate panels
+		createTopPanel();
+		createCenterPanel();
+
+		// add panels back
 		container.add(topPanel, BorderLayout.NORTH);
 		container.add(centerPanel, BorderLayout.CENTER);
 		
-		Point location = frame.getLocation();
+		// Revalidated and repaint
+		container.revalidate();
+		container.repaint();
 		
-		frame.setBounds(location.x, location.y, PUIWidth, PUIHeight + 1);
-		
-		frame.validate();
-		frame.setBounds(location.x, location.y, PUIWidth, PUIHeight);
-
+//		Point location = frame.getLocation();
+//		
+//		frame.setBounds(location.x, location.y, PUIWidth, PUIHeight + 1);
+//		
+//		frame.validate();
+//		frame.setBounds(location.x, location.y, PUIWidth, PUIHeight);
 	}
 
 
 
 
-//gets rid of all secondary windows
+	//gets rid of all secondary windows
 	private static void disposeOtherWindows() {
 		
 		
@@ -350,6 +349,32 @@ public class PrototypeUI extends JFrame implements UISettings{
 		}
 	}
 
+    private static void removeAll(Panel panel) {
+        panel.removeAll();
+        validate(panel);
+    }
+
+    private static void validate(Panel panel) {
+        panel.revalidate();
+        panel.repaint();
+    }
+    
+    private static void updateUI() {
+    	
+    	
+    	ActionListener taskPerformer = new ActionListener() {
+    		int count = 0;
+    		public void actionPerformed(ActionEvent evt) {
+    			
+    			updateFrame();
+//    			System.out.println(count++);
+    		}
+    	};
+    	
+    	Timer timer = new Timer(1000, taskPerformer);
+    	timer.setRepeats(true);
+    	timer.start();
+    }
 
 }
 

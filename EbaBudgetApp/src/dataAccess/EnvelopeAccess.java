@@ -50,6 +50,13 @@ public class EnvelopeAccess {
 		return null;
 	}
 	
+	public static Boolean hasEnvelope(Envelope e) {
+		for(int index = 0; index < envelopes.size(); index++) {
+			if(envelopes.get(index) == e) return true;
+		}
+		return false;
+	}
+	
 	public static Envelope getExtra() {
 		ArrayList<Envelope> envelopes = EnvelopeAccess.getEnvelopes();
 		for(int index = 0; index < envelopes.size(); index++) {

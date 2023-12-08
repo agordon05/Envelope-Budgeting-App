@@ -301,7 +301,9 @@ public class editUI extends JFrame implements ActionListener, UISettings{
 			System.out.println("Remove button pressed");
 			//check user's decision
 			//remove
-			EnvelopeAccess.removeEnvelope(name);
+			ResponseTicket response = Actions.Remove(envelope);
+			response.printMessages();
+			if(response.getErrorMessages().size() != 0) return;
 			
 		}
 		else if(e.getActionCommand().equals("Submit")) {

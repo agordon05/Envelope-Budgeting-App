@@ -22,6 +22,10 @@ public class EnvelopeActions extends precisionOperations{
 			return;
 		}
 
+		if(!EnvelopeAccess.hasEnvelope(envelope)) {
+			response.addErrorMessage("Envelope is not in Envelope Access");
+			return;
+		}
 
 		ArrayList<Envelope> envelopes = EnvelopeAccess.getEnvelopes();
 
@@ -104,15 +108,24 @@ public class EnvelopeActions extends precisionOperations{
 	//Transfers amount from e1 to e2
 	public static void Transfer(ResponseTicket response, Envelope e1, Envelope e2, double amount) {
 
-
+		if(amount <= 0) {
+			response.addErrorMessage("Cannot withdraw an amount less than or equal to 0");
+			return;
+		}
+		
+		
+		if(e1 == null && e2 == null) {
+			response.addErrorMessage("Both envelopes cannot be null");
+			return;
+		}
 		//if e1 is null, it is a deposit
 		if(e1 == null) {
-			deposit(response, e2, amount);
+			depositIntoEnvelope(response, e2, amount);
 			return;
 		}
 		//if e2 is null, it is a withdrawal
 		if(e2 == null) {
-			withdrawal(response, e1, amount);
+			withdrawFromSingleEnvelope(response, e1, amount);
 			return;
 		}
 
@@ -257,21 +270,78 @@ public class EnvelopeActions extends precisionOperations{
 		
 	}
 	
-	public static void deposit(ResponseTicket response, Envelope e, double amount) {
+	private static void deposit(ResponseTicket response, Envelope e, double amount) {
 		e.setAmount(add(e.getAmount(), amount));
 		//e.setAmount(e.getAmount() + amount);
 		response.addInfoMessage("Envelope " + e.getName() + " has been deposited $" + amount);
 		
 	}
-
 	
-	public static void withdrawal(ResponseTicket response, Envelope e, double amount) {
+	public static void depositIntoEnvelope(ResponseTicket response, Envelope envelope, double amount) {
+		if(envelope == null) {
+			depositIntoAll(response, amount);
+			return;
+		}
+		if(amount == 0) {
+			response.addInfoMessage("Cannot deposit $0 from " + envelope.getName());
+			return;
+		}
+		
+		
+		//if envelope does not have enough to cover amount, withdraw what's possible
+		if(amount < 0) {
+			response.addErrorMessage("Cannot deposit negative amount");
+			return;
+		}
+		//withdraw all of the amount
+		
+		deposit(response, envelope, amount);
+		return;
+
+
+		
+	}
+
+	private static void withdrawal(ResponseTicket response, Envelope e, double amount) {
 		e.setAmount(subtract(e.getAmount(), amount));
 		//e.setAmount(e.getAmount() - amount);
 		response.addInfoMessage("$" + amount + " has been withdrawn from Envelope " + e.getName());
 
 	}
 
+	public static void withdrawFromSingleEnvelope(ResponseTicket response, Envelope envelope, double amount) {
+		
+		if(envelope == null) {
+			response.addInfoMessage("Cannot withdraw from envelope, envelope does not exist");
+			return;
+		}
+		if(amount == 0) {
+			response.addInfoMessage("Cannot withdraw $0 from " + envelope.getName());
+			return;
+		}
+		
+		//pointless to continue if envelope is empty
+		if(envelope.getAmount() == 0) {
+			response.addInfoMessage(envelope.getName() + " is already empty, cannot be withdrawn from");
+			return;
+		}
+		
+		
+		
+		//if envelope does not have enough to cover amount, withdraw what's possible
+		if(envelope.getAmount() < amount) {
+			response.addErrorMessage("Invalid Envelope Transfer, Insufficient funds");
+		}
+		//withdraw all of the amount
+		else {
+			withdrawal(response, envelope, amount);
+			return;
+		}
+		
+		
+		return;
+	}
+	
 	public static double withdrawFromEnvelope(ResponseTicket response, Envelope envelope, double amount) {
 		
 		if(envelope == null) {

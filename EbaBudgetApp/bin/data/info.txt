@@ -1,0 +1,12 @@
+478.71
+1#Gas#100.0#3#30#true#100#false#false
+2#Groceries#0.0#3#80#true#200#false#false
+3#Puppy Supplies#0.0#3#35#true#200#false#false
+4#Christmas#166.86#3#40#true#400#false#false
+5#Nicotine#0.0#3#20#true#50#false#false
+6#Personal#20.0#3#20#true#50#false#false
+7#Maintenance#6.0#3#6#true#200#false#false
+8#Emergency Fund#85.85#1#0#true#200#false#true
+9#Next week#100.0#1#0#true#200#false#false
+10#Savings#0.0#1#0#false#0#true#false
+

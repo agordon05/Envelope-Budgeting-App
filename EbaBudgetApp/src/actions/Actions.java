@@ -63,6 +63,29 @@ public class Actions extends precisionOperations{
 		}
 		
 		
+		
+		//formatting priority -- 
+		boolean priorityCheck = false;
+		for(int index = 1; index <= EnvelopeAccess.getEnvelopes().size() || priorityCheck; index++) {
+			if(index <= 0) index = 1;
+			Envelope e = EnvelopeAccess.getEnvelopeByPriority(index);
+			
+			if(e == null) {
+				priorityCheck = true;
+				continue;
+			}
+			if(priorityCheck) {
+				e.setPriority(index - 1);
+				index -= 3;
+			}
+			
+			priorityCheck = false;
+		
+			
+		}
+		
+		
+		
 		//balance does not match with envelope balances
 		if(amount < 0) {
 			amount = Math.abs(amount);
@@ -79,7 +102,7 @@ public class Actions extends precisionOperations{
 		//balance does not match with envelope balances
 		else if(amount > 0) {
 			response.addErrorMessage("Account validation failed. adding unnaccounted funds");
-			EnvelopeActions.deposit(response, EnvelopeAccess.getEnvelopeByPriority(1), amount);
+			EnvelopeActions.depositIntoEnvelope(response, EnvelopeAccess.getEnvelopeByPriority(1), amount);
 			
 			check = true;
 		}
@@ -114,6 +137,7 @@ public class Actions extends precisionOperations{
 		
 		//withdraw from envelope given
 		amount = EnvelopeActions.withdrawFromEnvelope(response, envelope, amount);
+		
 		//withdraw from Default envelope
 		amount = EnvelopeActions.withdrawFromEnvelope(response, EnvelopeAccess.getDefault(), amount);
 		//withdraw from all starting from lowest priority
@@ -149,7 +173,7 @@ public class Actions extends precisionOperations{
 		else {
 			response.addInfoMessage("Depositing $" + amount + " into " + e.getName());
 			//EnvelopeActions.Transfer(response, null, e, amount);
-			EnvelopeActions.deposit(response, e, amount);
+			EnvelopeActions.depositIntoEnvelope(response, e, amount);
 		}
 		
 		
@@ -282,5 +306,45 @@ public class Actions extends precisionOperations{
 		return response;
 	}
 	
+	public static ResponseTicket Remove(Envelope e) {
+		ResponseTicket response = new ResponseTicket();
+		ResponseTicket transferResponse;
+
+		double amount = e.getAmount();
+		if(amount < 0) {
+			response.addErrorMessage("Envelope cannot have a negative amount");
+			return response;
+		}
+		if(amount > 0) {
+			//moves amount to extra if possible
+			if(EnvelopeAccess.getExtra() != null) {
+				response.addInfoMessage("Transfering envelope amount to " + EnvelopeAccess.getExtra().getName());
+				transferResponse = Transfer(e, EnvelopeAccess.getExtra(), amount);
+
+				response.add(transferResponse);
+			}
+			//moves amount to highest priority that isn't the envelope being removed
+			else if(EnvelopeAccess.getEnvelopes().size() > 1){
+				Envelope e2;
+
+				if(e.getPriority() != 1) e2 = EnvelopeAccess.getEnvelopeByPriority(1);
+				else e2 = EnvelopeAccess.getEnvelopeByPriority(2);
+				transferResponse = Transfer(e, e2, amount);
+				response.add(transferResponse);
+
+			}
+			//Invalid Action, cannot remove envelope, nowhere for envelope amount to be transfered to
+			else {
+				response.addErrorMessage("Cannot remove envelope, nowhere for envelope amount to be transfered to");
+				return response;
+			}
+		}
+
+		if(response.getErrorMessages().size() == 0) {
+			EnvelopeAccess.removeEnvelope(e.getName());
+		}
+		
+		return response;
+	}
 	
 }

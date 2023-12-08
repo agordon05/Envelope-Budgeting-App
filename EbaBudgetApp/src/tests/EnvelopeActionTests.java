@@ -208,9 +208,9 @@ class EnvelopeActionTests {
 		//invalid transfer
 		EnvelopeActions.Transfer(response, e1, e2, -10);
 		assertTrue(e1.getAmount() == 30, "e1 Envelope should have $30");
-		assertTrue(response.getErrorMessages().size() == 3, "There should be three error messages");
+		assertTrue(response.getErrorMessages().size() == 3, "There should be three error messages but has " + response.getErrorMessages().size());
 		assertTrue(response.getInfoMessages().size() == 2, "There should be two info message");
-		assertTrue(response.getErrorMessages().get(2).equals("Invalid envelope transfer, amount cannot be less than or equal to 0"), "Incorrect error message");
+		assertTrue(response.getErrorMessages().get(2).equals("Cannot withdraw an amount less than or equal to 0"), "Incorrect error message");
 
 		
 		//invalid transfer
@@ -219,7 +219,7 @@ class EnvelopeActionTests {
 		assertTrue(e2.getAmount() == 60, "e2 Envelope should have $60");
 		assertTrue(response.getErrorMessages().size() == 4, "There should be four error messages");
 		assertTrue(response.getInfoMessages().size() == 2, "There should be two info message");
-		assertTrue(response.getErrorMessages().get(3).equals("Invalid envelope transfer, amount cannot be less than or equal to 0"), "Incorrect error message");
+		assertTrue(response.getErrorMessages().get(3).equals("Cannot withdraw an amount less than or equal to 0"), "Incorrect error message");
 
 		
 		//invalid transfer
@@ -230,17 +230,19 @@ class EnvelopeActionTests {
 		assertTrue(response.getInfoMessages().size() == 2, "There should be two info message");
 		assertTrue(response.getErrorMessages().get(4).equals("Invalid envelope transfer, amount cannot be more than envelope amount"), "Incorrect error message");
 
+		response.printMessages();
 		
 		//invalid withdrawal
 		EnvelopeActions.Transfer(response, e3, null, 60);
-		assertTrue(e3.getAmount() == 50, "e3 Envelope should have $50");
+		assertTrue(e3.getAmount() == 50, "e3 Envelope should have $50 but has " + e3.getAmount());
 		assertTrue(response.getErrorMessages().size() == 6, "There should be six error messages");
 		assertTrue(response.getInfoMessages().size() == 2, "There should be two info message");
 		assertTrue(response.getErrorMessages().get(5).equals("Invalid Envelope Transfer, Insufficient funds"), "Incorrect error message");
 
+		System.out.println(e3.getAmount() + "");
 		//invalid withdrawal
 		EnvelopeActions.Transfer(response, e3, null, -10);
-		assertTrue(e3.getAmount() == 50, "e3 Envelope should have $50");
+		assertTrue(e3.getAmount() == 50, "e3 Envelope should have $50 but has " + e3.getAmount());
 		assertTrue(response.getErrorMessages().size() == 7, "There should be seven error messages");
 		assertTrue(response.getInfoMessages().size() == 2, "There should be two info message");
 		assertTrue(response.getErrorMessages().get(6).equals("Cannot withdraw an amount less than or equal to 0"), "Incorrect error message");
