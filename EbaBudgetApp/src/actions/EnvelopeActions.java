@@ -2,9 +2,11 @@ package actions;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 
-import dataAccess.EnvelopeAccess;
-import dataObjects.Balance;
+import data.Database;
+//import dataAccess.EnvelopeAccess;
+//import dataObjects.Balance;
 import dataObjects.Envelope;
 import settings.EnvelopeSettings;
 import tickets.ResponseTicket;
@@ -22,12 +24,12 @@ public class EnvelopeActions extends precisionOperations{
 			return;
 		}
 
-		if(!EnvelopeAccess.hasEnvelope(envelope)) {
+		if(!Database.hasEnvelope(envelope.getName())) {
 			response.addErrorMessage("Envelope is not in Envelope Access");
 			return;
 		}
 
-		ArrayList<Envelope> envelopes = EnvelopeAccess.getEnvelopes();
+		List<Envelope> envelopes = Database.getEnvelopes();
 
 		if(priority <= 0 || priority > envelopes.size()) {
 			response.addErrorMessage("Invalid envelope edit, prority outside of range");
@@ -85,7 +87,7 @@ public class EnvelopeActions extends precisionOperations{
 			return;
 		}
 
-		ArrayList<Envelope> envelopes = EnvelopeAccess.getEnvelopes();
+		List<Envelope> envelopes = Database.getEnvelopes();
 
 
 		for(int index = 0; index < envelopes.size(); index++) {
@@ -106,9 +108,9 @@ public class EnvelopeActions extends precisionOperations{
 
 	/* NOTE: CAP SETTING IS NOT CHECKED IN TRANSFER IT IS ONLY CHECKED FOR DEPOSITS INTO BANK ACCOUNT I.E DEPOSIT BANK STATEMENT*/
 	//Transfers amount from e1 to e2
-	public static void Transfer(ResponseTicket response, Envelope e1, Envelope e2, double amount) {
+	public static void Transfer(ResponseTicket response, Envelope e1, Envelope e2, BigDecimal amount) {
 
-		if(amount <= 0) {
+		if(amount.doubleValue() <= 0) {
 			response.addErrorMessage("Cannot withdraw an amount less than or equal to 0");
 			return;
 		}
@@ -134,17 +136,17 @@ public class EnvelopeActions extends precisionOperations{
 			return;
 		}
 
-		if(amount <= 0) {
+		if(amount.doubleValue() <= 0) {
 			response.addErrorMessage("Invalid envelope transfer, amount cannot be less than or equal to 0");
 			return;
 		}
-		if(e1.getAmount() < amount) {
+		if(e1.getAmount().doubleValue() < amount.doubleValue()) {
 			response.addErrorMessage("Invalid envelope transfer, amount cannot be more than envelope amount");
 			return;
 		}
 		
-		double fromAmount = subtract(e1.getAmount(), amount);
-		double toAmount = add(e2.getAmount(), amount);
+		BigDecimal fromAmount = subtract(e1.getAmount(), amount);
+		BigDecimal toAmount = add(e2.getAmount(), amount);
 		
 		e1.setAmount(fromAmount);
 		e2.setAmount(toAmount);
@@ -154,30 +156,30 @@ public class EnvelopeActions extends precisionOperations{
 
 	}
 	
-	public static void depositIntoAll(ResponseTicket response, double amount) {
+	public static void depositIntoAll(ResponseTicket response, BigDecimal amount) {
 				
 		
-		double fullAmount = amount;
-		
+		BigDecimal fullAmount = amount;
+		List<Envelope> envelopes = Database.getEnvelopes();
 		//deposit into those with percent fill setting
-		for(int index = 1; index <= EnvelopeAccess.getEnvelopes().size(); index++) {
+		for(int index = 1; index <= envelopes.size(); index++) {
 			
-			Envelope envelope = EnvelopeAccess.getEnvelopeByPriority(index);
+			Envelope envelope = Database.getEnvelopeByPriority(index);
 			
 			if(envelope.getFillSetting() == EnvelopeSettings.percentage) {
 				
 				// EX: 10 / 100 = 0.1
-				double percentAmount = divide(envelope.getFillAmount(), 100);
+				BigDecimal percentAmount = divide(envelope.getFillAmount(), 100);
 				
 				// EX: 500 * 0.1 = 50
-				double tempAmount = multiply(fullAmount, percentAmount);
+				BigDecimal tempAmount = multiply(fullAmount, percentAmount);
 				
 				//format temp amount
-				int formattedAmount = (int)multiply(tempAmount, 100);
+				int formattedAmount = multiply(tempAmount, new BigDecimal(100)).intValue();
 				tempAmount = divide(formattedAmount, 100);
 				
 				//deposit tempAmount
-				EnvelopeActions.deposit(response, envelope, tempAmount);
+				deposit(response, envelope, tempAmount);
 				
 				//subtract tempAmount from amount
 				amount = subtract(amount, tempAmount);
@@ -185,17 +187,17 @@ public class EnvelopeActions extends precisionOperations{
 				response.addInfoMessage("deposited " + tempAmount + " into " + envelope.getName());
 			}
 
-			if(amount == 0) return;
+			if(amount.doubleValue() == 0) return;
 		}
 		
 		
 		
 		//deposit rest -- index == priority
-		for(int index = 1; index <= EnvelopeAccess.getEnvelopes().size(); index++) {
+		for(int index = 1; index <= envelopes.size(); index++) {
 			
-			Envelope e = EnvelopeAccess.getEnvelopeByPriority(index);
+			Envelope e = Database.getEnvelopeByPriority(index);
 			
-			double amountToDeposit;
+			BigDecimal amountToDeposit;
 			
 			switch(e.getFillSetting()) {
 				default: throw new IllegalStateException("envelope has an invalid fill setting");
@@ -208,16 +210,16 @@ public class EnvelopeActions extends precisionOperations{
 
 						//get amounts needed
 						int capAmount = e.getCapAmount();
-						double envelopeAmount = e.getAmount();
+						BigDecimal envelopeAmount = e.getAmount();
 
 						//skip if envelope is full
-						if(envelopeAmount >= capAmount) continue;
+						if(envelopeAmount.doubleValue() >= capAmount) continue;
 
 						//get max amount envelope can be deposited
-						amountToDeposit = subtract(capAmount, envelopeAmount);
+						amountToDeposit = subtract(new BigDecimal(capAmount), envelopeAmount);
 
 						//check if deposit amount is less than max amount
-						if(amountToDeposit > amount) amountToDeposit = amount;
+						if(amountToDeposit.doubleValue() > amount.doubleValue()) amountToDeposit = amount;
 
 					}
 					//envelope does not have a cap
@@ -230,18 +232,18 @@ public class EnvelopeActions extends precisionOperations{
 				
 				case EnvelopeSettings.amount: {
 					
-					amountToDeposit = e.getFillAmount();
+					amountToDeposit = new BigDecimal(e.getFillAmount());
 					//if envelope fill amount is greater than amount available, change amountToDeposit to amount available
-					if(amountToDeposit > amount) amountToDeposit = amount;
+					if(amountToDeposit.doubleValue() > amount.doubleValue()) amountToDeposit = amount;
 					
 					//checks cap amount
 					if(e.hasCap()) {
 						
-						double amountTillFull = subtract(e.getCapAmount(), e.getAmount());
+						BigDecimal amountTillFull = subtract(new BigDecimal(e.getCapAmount()), e.getAmount());
 						//if envelope is full continue
-						if(amountTillFull <= 0) continue;
+						if(amountTillFull.doubleValue() <= 0) continue;
 						//if amount to deposit is bigger than amount for envelope to be full, amount to deposit is the amount till full
-						if(amountToDeposit > amountTillFull) {
+						if(amountToDeposit.doubleValue() > amountTillFull.doubleValue()) {
 							amountToDeposit = amountTillFull;
 						}
 					}
@@ -250,46 +252,56 @@ public class EnvelopeActions extends precisionOperations{
 			}
 			
 			
-			EnvelopeActions.deposit(response, e, amountToDeposit);
+			deposit(response, e, amountToDeposit);
 			amount = subtract(amount, amountToDeposit);
 			//amount -= amountToDeposit;
 			response.addInfoMessage("deposited $" + amountToDeposit + " into " + e.getName());
 			
-			if(amount == 0) return;	
+			if(amount.doubleValue() == 0) return;	
 		}
 		
 		
 		//deposit left over amount into envelope marked extra if there is one, otherwise validate will put it into the 1st priority envelope
-		ArrayList<Envelope> envelopes = EnvelopeAccess.getEnvelopes();
 		for(int index = 0; index < envelopes.size(); index++) {
 			if(!envelopes.get(index).isExtra()) continue;
-			EnvelopeActions.deposit(response, envelopes.get(index), amount);
+			deposit(response, envelopes.get(index), amount);
+			amount = BigDecimal.ZERO;
 			response.addInfoMessage("deposited $" + amount + " into " + envelopes.get(index).getName());
 
+		}
+		if(amount.doubleValue() > 0) {
+			Envelope e = Database.getEnvelopeByPriority(1);
+			if(e != null) {
+				deposit(response, e, amount);
+				response.addInfoMessage("deposited $" + amount + "into " + e.getName() + ". no envelope is marked as extra");
+			}
+			else {
+				response.addErrorMessage("$" + amount + "is unnaccounted for. No envelopes exist to be deposited into");
+			}
 		}
 		
 	}
 	
-	private static void deposit(ResponseTicket response, Envelope e, double amount) {
+	private static void deposit(ResponseTicket response, Envelope e, BigDecimal amount) {
 		e.setAmount(add(e.getAmount(), amount));
 		//e.setAmount(e.getAmount() + amount);
 		response.addInfoMessage("Envelope " + e.getName() + " has been deposited $" + amount);
 		
 	}
 	
-	public static void depositIntoEnvelope(ResponseTicket response, Envelope envelope, double amount) {
+	public static void depositIntoEnvelope(ResponseTicket response, Envelope envelope, BigDecimal amount) {
 		if(envelope == null) {
 			depositIntoAll(response, amount);
 			return;
 		}
-		if(amount == 0) {
+		if(amount.doubleValue() == 0) {
 			response.addInfoMessage("Cannot deposit $0 from " + envelope.getName());
 			return;
 		}
 		
 		
 		//if envelope does not have enough to cover amount, withdraw what's possible
-		if(amount < 0) {
+		if(amount.doubleValue() < 0) {
 			response.addErrorMessage("Cannot deposit negative amount");
 			return;
 		}
@@ -302,26 +314,26 @@ public class EnvelopeActions extends precisionOperations{
 		
 	}
 
-	private static void withdrawal(ResponseTicket response, Envelope e, double amount) {
+	private static void withdrawal(ResponseTicket response, Envelope e, BigDecimal amount) {
 		e.setAmount(subtract(e.getAmount(), amount));
 		//e.setAmount(e.getAmount() - amount);
 		response.addInfoMessage("$" + amount + " has been withdrawn from Envelope " + e.getName());
 
 	}
 
-	public static void withdrawFromSingleEnvelope(ResponseTicket response, Envelope envelope, double amount) {
+	public static void withdrawFromSingleEnvelope(ResponseTicket response, Envelope envelope, BigDecimal amount) {
 		
 		if(envelope == null) {
 			response.addInfoMessage("Cannot withdraw from envelope, envelope does not exist");
 			return;
 		}
-		if(amount == 0) {
+		if(amount.doubleValue() == 0) {
 			response.addInfoMessage("Cannot withdraw $0 from " + envelope.getName());
 			return;
 		}
 		
 		//pointless to continue if envelope is empty
-		if(envelope.getAmount() == 0) {
+		if(envelope.getAmount().doubleValue() == 0) {
 			response.addInfoMessage(envelope.getName() + " is already empty, cannot be withdrawn from");
 			return;
 		}
@@ -329,7 +341,7 @@ public class EnvelopeActions extends precisionOperations{
 		
 		
 		//if envelope does not have enough to cover amount, withdraw what's possible
-		if(envelope.getAmount() < amount) {
+		if(envelope.getAmount().doubleValue() < amount.doubleValue()) {
 			response.addErrorMessage("Invalid Envelope Transfer, Insufficient funds");
 		}
 		//withdraw all of the amount
@@ -342,19 +354,19 @@ public class EnvelopeActions extends precisionOperations{
 		return;
 	}
 	
-	public static double withdrawFromEnvelope(ResponseTicket response, Envelope envelope, double amount) {
+	public static BigDecimal withdrawFromEnvelope(ResponseTicket response, Envelope envelope, BigDecimal amount) {
 		
 		if(envelope == null) {
 			response.addInfoMessage("Cannot withdraw from envelope, envelope does not exist");
 			return amount;
 		}
-		if(amount == 0) {
+		if(amount.doubleValue() == 0) {
 			response.addInfoMessage("Cannot withdraw $0 from " + envelope.getName());
-			return 0;
+			return BigDecimal.ZERO;
 		}
 		
 		//pointless to continue if envelope is empty
-		if(envelope.getAmount() == 0) {
+		if(envelope.getAmount().doubleValue() == 0) {
 			response.addInfoMessage(envelope.getName() + " is already empty, cannot be withdrawn from");
 			return amount;
 		}
@@ -362,14 +374,14 @@ public class EnvelopeActions extends precisionOperations{
 		
 		
 		//if envelope does not have enough to cover amount, withdraw what's possible
-		if(envelope.getAmount() < amount) {
+		if(envelope.getAmount().doubleValue() < amount.doubleValue()) {
 			amount = subtract(amount, envelope.getAmount());			
 			withdrawal(response, envelope, envelope.getAmount());
 		}
 		//withdraw all of the amount
 		else {
 			withdrawal(response, envelope, amount);
-			return 0;
+			return BigDecimal.ZERO;
 		}
 		
 		
@@ -378,20 +390,20 @@ public class EnvelopeActions extends precisionOperations{
 
 
 	
-	public static void withdrawFromAll(ResponseTicket response, double amount) {
+	public static void withdrawFromAll(ResponseTicket response, BigDecimal amount) {
 
 
 
 		//loop from lowest to highest priority until looped through all envelopes or until amount is 0
-		for(int index = EnvelopeAccess.getEnvelopes().size(); index > 0 && amount > 0; index--) {
+		for(int index = Database.getEnvelopes().size(); index > 0 && amount.doubleValue() > 0; index--) {
 			
-			Envelope envelope = EnvelopeAccess.getEnvelopeByPriority(index);
+			Envelope envelope = Database.getEnvelopeByPriority(index);
 			
 			amount = withdrawFromEnvelope(response, envelope, amount);
 			
 		}
 		
-		if(amount == 0)
+		if(amount.doubleValue() == 0)
 			response.addInfoMessage("Withdraw was successfull");
 		else {
 			response.addErrorMessage("Withdraw overdrafted account");
@@ -519,7 +531,7 @@ public class EnvelopeActions extends precisionOperations{
 		//if extra given is true
 		else {
 			//setting envelope given to extra and rest to false
-			ArrayList<Envelope> envelopes = EnvelopeAccess.getEnvelopes();
+			List<Envelope> envelopes = Database.getEnvelopes();
 			for(int index = 0; index < envelopes.size(); index++) {
 				if(envelopes.get(index).equals(e)) {
 					envelopes.get(index).setExtra(extra);
@@ -550,7 +562,7 @@ public class EnvelopeActions extends precisionOperations{
 		//if default given is true
 		else {
 			//setting envelope given to extra and rest to false
-			ArrayList<Envelope> envelopes = EnvelopeAccess.getEnvelopes();
+			List<Envelope> envelopes = Database.getEnvelopes();
 			for(int index = 0; index < envelopes.size(); index++) {
 				if(envelopes.get(index).equals(e)) {
 					envelopes.get(index).setDefault(Default);
@@ -565,7 +577,7 @@ public class EnvelopeActions extends precisionOperations{
 	
 	//does not count envelope given
 	public static int getTotalFillPercentage(Envelope e) {
-		ArrayList<Envelope> envelopes = EnvelopeAccess.getEnvelopes();
+		List<Envelope> envelopes = Database.getEnvelopes();
 		
 		
 		int sum = 0;

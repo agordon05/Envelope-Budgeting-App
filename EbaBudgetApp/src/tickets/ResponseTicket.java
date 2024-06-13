@@ -2,9 +2,6 @@ package tickets;
 
 import java.util.ArrayList;
 
-import dataObjects.Envelope;
-import dataObjects.Statement;
-import dataObjects.Vendor;
 
 public class ResponseTicket {
 

@@ -13,13 +13,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.math.BigDecimal;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 
-import dataAccess.EnvelopeAccess;
+import data.Database;
 import dataObjects.Envelope;
 import settings.EnvelopeSettings;
 import settings.UISettings;
@@ -274,7 +275,7 @@ public class addEnvelopeUI extends JFrame implements ActionListener, UISettings{
 		
 		//validate name
 		if(name == null || name.equals("")) return;
-		Envelope env = EnvelopeAccess.getEnvelopeByName(name);
+		Envelope env = Database.getEnvelope(name);
 		if(env != null) return;
 
 
@@ -290,8 +291,9 @@ public class addEnvelopeUI extends JFrame implements ActionListener, UISettings{
 
 		
 		//create envelope
-		Envelope envelope = new Envelope(0, name, 0, fill, fillAmount, cap, capAmount, extra, Default);
-		EnvelopeAccess.addEnvelope(envelope);
+		int priority = Database.getEnvelopes().size() + 1;
+		Envelope envelope = new Envelope(priority, name, BigDecimal.ZERO, fill, fillAmount, cap, capAmount, extra, Default);
+		Database.addEnvelope(envelope);
 
 		
 		//update

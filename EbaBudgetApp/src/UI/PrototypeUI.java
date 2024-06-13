@@ -2,19 +2,19 @@ package UI;
 
 import java.awt.*;
 import java.awt.event.*;
-
+import java.math.BigDecimal;
 
 import javax.swing.*;
 
 import actions.Actions;
 import actions.precisionOperations;
-import dataAccess.BalanceAccess;
-import dataAccess.EnvelopeAccess;
+//import dataAccess.BalanceAccess;
+//import dataAccess.EnvelopeAccess;
 import dataObjects.Envelope;
 import settings.EnvelopeSettings;
 import settings.UISettings;
 import tickets.ResponseTicket;
-
+import data.Database;
 
 
 public class PrototypeUI extends JFrame implements UISettings{
@@ -65,10 +65,13 @@ public class PrototypeUI extends JFrame implements UISettings{
 	//frame setup
 	public static void main(String[] args) {
 
-		//create data
-		new tempInfo();
-		
+//		//create data
+//		new tempInfo();
+//		
 		//frame
+		Database.createNewDatabase();
+		Database.printAllEnvelopes();
+//		Database.removeEnvelope("Puppy Supplies");
 		frame = new PrototypeUI();
 		frame.setTitle("eba prototype");
 		frame.setBounds(PUIx, PUIy, PUIWidth, PUIHeight);
@@ -79,6 +82,13 @@ public class PrototypeUI extends JFrame implements UISettings{
 		
 		updateUI();
 //		updateFrame();
+		
+//        Database.createNewDatabase();
+//        System.out.println(Database.tableExists("envelopes"));
+//        Database.addEnvelope("Groceries", 1, new BigDecimal(200.0), 1, 50, false, 0, false, true);
+//        Database.printAllEnvelopes();
+//        Database.removeEnvelope("Groceries");
+		
 		
 	}
 	
@@ -136,7 +146,14 @@ public class PrototypeUI extends JFrame implements UISettings{
 		validate(buttonPanel);
 		
 		//Balance label
-		Label balance = new Label("Balance: $" + String.format("%.2f", BalanceAccess.getBalance().getBalance()));
+		BigDecimal b = Database.getBalance();
+		Label balance;
+		if(b == null) {
+			balance = new Label("Balance: $" + String.format("%.2f", 0));
+		}
+		else {
+			 balance = new Label("Balance: $" + String.format("%.2f", b));
+		}
 		balancePanel.add(Box.createHorizontalGlue());
 		balancePanel.add(balance);
 		balancePanel.add(Box.createHorizontalGlue());
@@ -180,7 +197,7 @@ public class PrototypeUI extends JFrame implements UISettings{
 			
 		});
 		
-		if(EnvelopeAccess.getEnvelopes().size() < 10) {
+		if(Database.getEnvelopes().size() < 10) {
 			removeAll(addEnvPanel);
 			//panel 2
 			addEnvPanel.setLayout(new BoxLayout(addEnvPanel, BoxLayout.LINE_AXIS));
@@ -199,20 +216,20 @@ public class PrototypeUI extends JFrame implements UISettings{
 
 	private static void createBody() {
 		
-		int numOfEnvelopes = EnvelopeAccess.getEnvelopes().size();
+		int numOfEnvelopes = Database.getEnvelopes().size();
 		removeAll(bodyPanel);
 		//panel
-		bodyPanel.setLayout(new GridLayout(EnvelopeAccess.getEnvelopes().size(),5,0,0));
+		bodyPanel.setLayout(new GridLayout(numOfEnvelopes,5,0,0));
 		bodyPanel.setSize(PUIWidth, envelopeHeight * numOfEnvelopes);
 		bodyPanel.setMaximumSize(new Dimension(PUIWidth, envelopeHeight * maxNumOfEnvelopes));
 		bodyPanel.setPreferredSize(new Dimension(PUIWidth, envelopeHeight * numOfEnvelopes));
 		
 		
 		//create row for each existing envelope
-		for(int index = 0; index < EnvelopeAccess.getEnvelopes().size(); index++) {
-			
+		for(int index = 1; index <= numOfEnvelopes; index++) {
+//			System.out.println("" + index);
 			//envelope
-			Envelope envelope = EnvelopeAccess.getEnvelopeByPriority(index + 1);
+			Envelope envelope = Database.getEnvelopeByPriority(index);
 			
 			//priority
 			Label priority;
@@ -231,8 +248,8 @@ public class PrototypeUI extends JFrame implements UISettings{
 			//amount
 			Label amount;
 			//amount is a whole number
-			if( (int)(envelope.getAmount()) == envelope.getAmount() ) {
-				amount = new Label("$" + (int)envelope.getAmount() + 
+			if(envelope.getAmount().intValue() == envelope.getAmount().doubleValue() ) {
+				amount = new Label("$" + (int)envelope.getAmount().intValue() + 
 						(envelope.hasCap() ? "/$" + envelope.getCapAmount() : ""));
 			}
 			//amount is not a whole number
@@ -292,7 +309,7 @@ public class PrototypeUI extends JFrame implements UISettings{
 		ResponseTicket response = Actions.validate();
 		response.printMessages();
 		
-		tempInfo.save();
+//		tempInfo.save();
 		
 		updateFrame();
 

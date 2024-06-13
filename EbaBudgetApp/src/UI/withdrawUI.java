@@ -2,16 +2,18 @@ package UI;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.math.BigDecimal;
 
 import javax.swing.*;
 import javax.swing.text.*;
 
 import actions.Actions;
 import actions.EnvelopeActions;
-import dataAccess.EnvelopeAccess;
-import dataAccess.VendorAccess;
+import data.Database;
+//import dataAccess.EnvelopeAccess;
+//import dataAccess.VendorAccess;
 import dataObjects.Envelope;
-import dataObjects.Vendor;
+//import dataObjects.Vendor;
 import settings.UISettings;
 import settings.textFilters;
 import tickets.ResponseTicket;
@@ -102,11 +104,11 @@ public class withdrawUI extends JFrame implements ActionListener, UISettings {
 
 
 		//envelope list
-		int envelopeSize = EnvelopeAccess.getEnvelopes().size();
+		int envelopeSize = Database.getEnvelopes().size();
 		String[] envelopeNames = new String[envelopeSize];
 
 		for(int index = 0; index < envelopeSize; index++) {
-			envelopeNames[index] = EnvelopeAccess.getEnvelopeByPriority(index + 1).getName();
+			envelopeNames[index] = Database.getEnvelopeByPriority(index + 1).getName();
 		}
 		envelopeList = new JComboBox(envelopeNames);
 		envelopeList.setSelectedIndex(0);
@@ -186,8 +188,8 @@ public class withdrawUI extends JFrame implements ActionListener, UISettings {
 
 
 		//withdraw		
-		double amount = Double.parseDouble(amountText.getText());
-		Envelope envelope = EnvelopeAccess.getEnvelopeByName(envelopeList.getSelectedItem().toString());
+		BigDecimal amount = new BigDecimal(amountText.getText());
+		Envelope envelope = Database.getEnvelope(envelopeList.getSelectedItem().toString());
 		ResponseTicket response = Actions.Withdraw("", envelope, amount);
 
 		response.printMessages();

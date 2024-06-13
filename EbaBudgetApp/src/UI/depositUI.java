@@ -12,11 +12,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.math.BigDecimal;
+import java.util.List;
 
 import javax.swing.*;
 
 import actions.Actions;
-import dataAccess.EnvelopeAccess;
+import data.Database;
 import dataObjects.Envelope;
 import settings.UISettings;
 import settings.textFilters;
@@ -74,10 +76,11 @@ public class depositUI extends JFrame implements ActionListener, UISettings{
 
 
 		//envelope list
-		String[] envelopes = new String[EnvelopeAccess.getEnvelopes().size() + 1];
+		List<Envelope> env = Database.getEnvelopes();
+		String[] envelopes = new String[env.size() + 1];
 		envelopes[0] = "";
-		for(int index = 1; index < EnvelopeAccess.getEnvelopes().size() + 1; index++) {
-			envelopes[index] = EnvelopeAccess.getEnvelopeByPriority(index).getName();
+		for(int index = 1; index < env.size() + 1; index++) {
+			envelopes[index] = Database.getEnvelopeByPriority(index).getName();
 		}
 		envList = new JComboBox(envelopes);
 		envList.setSelectedIndex(0);
@@ -158,9 +161,9 @@ public class depositUI extends JFrame implements ActionListener, UISettings{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		//envelope
-		Envelope envelope = EnvelopeAccess.getEnvelopeByName(envList.getSelectedItem().toString());
+		Envelope envelope = Database.getEnvelope(envList.getSelectedItem().toString());
 
-		ResponseTicket response = Actions.Deposit(envelope, Double.parseDouble(amount.getText().toString()));
+		ResponseTicket response = Actions.Deposit(envelope, new BigDecimal(amount.getText().toString()));
 		response.printMessages();
 
 		//update

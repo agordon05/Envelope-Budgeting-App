@@ -11,11 +11,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.math.BigDecimal;
+import java.util.List;
 
 import javax.swing.*;
 
 import actions.Actions;
-import dataAccess.EnvelopeAccess;
+import data.Database;
+//import dataAccess.EnvelopeAccess;
 import dataObjects.Envelope;
 import settings.UISettings;
 import settings.textFilters;
@@ -64,10 +67,11 @@ public class transferUI extends JFrame implements ActionListener, UISettings{
 
 
 		//envelope list data
-		String[] envelopes = new String[EnvelopeAccess.getEnvelopes().size()];
+		List<Envelope> env = Database.getEnvelopes();
+		String[] envelopes = new String[env.size()];
 
-		for(int index = 0; index < EnvelopeAccess.getEnvelopes().size(); index++) {
-			envelopes[index] = EnvelopeAccess.getEnvelopeByPriority(index + 1).getName();
+		for(int index = 0; index < env.size(); index++) {
+			envelopes[index] = Database.getEnvelopeByPriority(index + 1).getName();
 		}
 
 		//from label
@@ -221,10 +225,10 @@ public class transferUI extends JFrame implements ActionListener, UISettings{
 		if(envList.getSelectedItem().toString().equals(envList2.getSelectedItem().toString())) return;
 
 		//if from amount is greater than from envelope's amount -- return
-		double amount = Double.parseDouble(amountText.getText());
-		Envelope envelope = EnvelopeAccess.getEnvelopeByName(envList.getSelectedItem().toString());
-		Envelope envelope2 = EnvelopeAccess.getEnvelopeByName(envList2.getSelectedItem().toString());
-		if(amount > envelope.getAmount()) return;
+		BigDecimal amount = new BigDecimal(amountText.getText());
+		Envelope envelope = Database.getEnvelope(envList.getSelectedItem().toString());
+		Envelope envelope2 = Database.getEnvelope(envList2.getSelectedItem().toString());
+		if(amount.doubleValue() > envelope.getAmount().doubleValue()) return;
 		//transfer amount
 		ResponseTicket response = Actions.Transfer(envelope, envelope2, amount);
 		response.printMessages();

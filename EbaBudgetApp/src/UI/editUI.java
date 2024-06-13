@@ -16,7 +16,8 @@ import java.awt.event.KeyListener;
 import javax.swing.*;
 
 import actions.Actions;
-import dataAccess.EnvelopeAccess;
+import data.Database;
+//import dataAccess.EnvelopeAccess;
 import dataObjects.Envelope;
 import settings.EnvelopeSettings;
 import settings.UISettings;
@@ -86,7 +87,7 @@ public class editUI extends JFrame implements ActionListener, UISettings{
 		Label priorityLabel = new Label("Priority: ");
 		
 		//priority
-		String[] priorities = new String[EnvelopeAccess.getEnvelopes().size()];
+		String[] priorities = new String[Database.getEnvelopes().size()];
 		for(int index = 0; index < priorities.length; index++) {
 			priorities[index] = "" + (index + 1);
 		}
@@ -325,7 +326,7 @@ public class editUI extends JFrame implements ActionListener, UISettings{
 			boolean Default = defaultBox.getState();
 			
 			
-			ResponseTicket response = Actions.Edit(envelope, p, name, cap, capAmount, fillSetting, fillAmount, extra, Default);
+			ResponseTicket response = Actions.Edit(envelope, p, name, envelope.getAmount(), cap, capAmount, fillSetting, fillAmount, extra, Default);
 			response.printMessages();
 			
 			
