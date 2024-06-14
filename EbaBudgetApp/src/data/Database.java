@@ -22,7 +22,7 @@ public class Database {
      * Flag to indicate if the program is running from an IDE.
      * Set to false when making the program into an application.
      */
-    private static final boolean IDE = false;
+    private static final boolean IDE = true;
 
     /**
      * Checks if the program is running from an IDE.
