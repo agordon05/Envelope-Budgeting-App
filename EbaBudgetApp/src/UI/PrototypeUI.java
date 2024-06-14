@@ -175,7 +175,12 @@ public class PrototypeUI extends JFrame implements UISettings{
 		centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.PAGE_AXIS));
 		centerPanel.setBackground(Color.gray);
 		
-		createBody();
+		try {
+			createBody();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		centerPanel.add(bodyPanel);
 		
 		
@@ -214,7 +219,7 @@ public class PrototypeUI extends JFrame implements UISettings{
 		validate(centerPanel);
 	}
 
-	private static void createBody() {
+	private static void createBody() throws Exception {
 		
 		int numOfEnvelopes = Database.getEnvelopes().size();
 		removeAll(bodyPanel);
@@ -233,7 +238,11 @@ public class PrototypeUI extends JFrame implements UISettings{
 			
 			//priority
 			Label priority;
-			if(envelope.getFillSetting() == EnvelopeSettings.percentage) {
+			if(envelope == null) {
+				priority = new Label("\tE");
+				throw new Exception("prototypeUI - createBody - envelope is null: index: " + index);
+			}
+			else if(envelope.getFillSetting() == EnvelopeSettings.percentage) {
 				priority = new Label("\t-");
 			}
 			else priority = new Label("\t" + envelope.getPriority());

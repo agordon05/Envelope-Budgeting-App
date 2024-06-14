@@ -262,9 +262,10 @@ public class EnvelopeActions extends precisionOperations{
 		
 		
 		//deposit left over amount into envelope marked extra if there is one, otherwise validate will put it into the 1st priority envelope
-		for(int index = 0; index < envelopes.size(); index++) {
-			if(!envelopes.get(index).isExtra()) continue;
-			deposit(response, envelopes.get(index), amount);
+		for(int index = 1; index <= envelopes.size(); index++) {
+			Envelope e = Database.getEnvelopeByPriority(index);
+			if(!e.isExtra()) continue;
+			deposit(response, e, amount);
 			amount = BigDecimal.ZERO;
 			response.addInfoMessage("deposited $" + amount + " into " + envelopes.get(index).getName());
 

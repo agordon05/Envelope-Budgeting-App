@@ -299,11 +299,11 @@ public class Actions extends precisionOperations{
 		//edit envelope
 		Database.editEnvelope(e.getName(), name, priority, amount, fillSetting, fillAmount, cap, capAmount, extra, Default);
 		EnvelopeActions.setPriority(response, e, priority);
-		EnvelopeActions.EditName(response, e, name);
-		EnvelopeActions.EditCap(response, e, cap, capAmount);
-		EnvelopeActions.EditSettings(response, e, fillSetting, fillAmount);
-		EnvelopeActions.EditExtra(response, e, extra);
-		EnvelopeActions.EditDefault(response, e, Default);
+//		EnvelopeActions.EditName(response, e, name);
+//		EnvelopeActions.EditCap(response, e, cap, capAmount);
+//		EnvelopeActions.EditSettings(response, e, fillSetting, fillAmount);
+//		EnvelopeActions.EditExtra(response, e, extra);
+//		EnvelopeActions.EditDefault(response, e, Default);
 		
 		
 		
