@@ -1,5 +1,6 @@
 package data;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -24,12 +25,27 @@ import dataObjects.Envelope;
  */
 public class Database {
 
-    private static final String DB_FOLDER = "data"; // Folder within the project
-    private static final String DB_FILE = "envelopes.db"; // Database file name
+	private static final boolean IDE = true;
+	
+    private static boolean isRunningFromIDE() {
+        return IDE;
+    }
+    
+	private static String getDatabasePath() {
+        if (isRunningFromIDE()) {
+        	System.out.println("Running from IDE");
+        	String appDir = System.getProperty("user.dir");
+            // Adjust the database path for IDE environment
+            return "jdbc:sqlite:" + appDir + "/src/data/database.db";
+        } else {
+        	System.out.println("Running from Application");
+            // Adjust the database path for executable environment (JAR)
+    	    String appDir = "/Applications/Envelope Budgeting Application.app";
+    	    return "jdbc:sqlite:" + appDir + "/Contents/app/src/data/envelopes.db";
+        }
 
-    // URL to connect to the SQLite database (local path based on project directory)
-    private static final String URL = "jdbc:sqlite:" + System.getProperty("user.dir") + "/src/" + DB_FOLDER + "/" + DB_FILE;
-
+	}
+    
     public static void Initialize() {
     	createNewDatabase();
 //		EnvelopeAccess.Initialize();
@@ -71,7 +87,7 @@ public class Database {
      * Creates a new SQLite database if it doesn't exist and initializes necessary tables.
      */
     public static void createNewDatabase() {
-        try (Connection conn = DriverManager.getConnection(URL)) {
+        try (Connection conn = DriverManager.getConnection(getDatabasePath())) {
             if (conn != null) {
                 System.out.println("A new database has been created.");
                 createTables(conn); // Ensure tables are created after database creation
@@ -115,7 +131,7 @@ public class Database {
      * @return true if the table exists; false otherwise
      */
     public static boolean tableExists(String tableName) {
-        try (Connection conn = DriverManager.getConnection(URL)) {
+        try (Connection conn = DriverManager.getConnection(getDatabasePath())) {
             DatabaseMetaData meta = conn.getMetaData();
             try (ResultSet rs = meta.getTables(null, null, tableName, new String[] { "TABLE" })) {
                 return rs.next();
@@ -144,7 +160,7 @@ public class Database {
 
         String sql = "INSERT INTO envelopes(name, priority, amount, fill_setting, fill_amount, cap, cap_amount, extra, default_env) VALUES(?,?,?,?,?,?,?,?,?)";
 
-        try (Connection conn = DriverManager.getConnection(URL);
+        try (Connection conn = DriverManager.getConnection(getDatabasePath());
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, name);
             pstmt.setInt(2, priority);
@@ -166,7 +182,7 @@ public class Database {
 
         String sql = "INSERT INTO envelopes(name, priority, amount, fill_setting, fill_amount, cap, cap_amount, extra, default_env) VALUES(?,?,?,?,?,?,?,?,?)";
 
-        try (Connection conn = DriverManager.getConnection(URL);
+        try (Connection conn = DriverManager.getConnection(getDatabasePath());
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, e.getName());
             pstmt.setInt(2, e.getPriority());
@@ -202,7 +218,7 @@ public class Database {
             boolean cap, int capAmount, boolean extra, boolean defaultEnv) {
         String sql = "UPDATE envelopes SET name = ?, priority = ?, amount = ?, fill_setting = ?, fill_amount = ?, cap = ?, cap_amount = ?, extra = ?, default_env = ? WHERE name = ?";
 
-        try (Connection conn = DriverManager.getConnection(URL);
+        try (Connection conn = DriverManager.getConnection(getDatabasePath());
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, newName);
             pstmt.setInt(2, priority);
@@ -233,7 +249,7 @@ public class Database {
     public static boolean removeEnvelope(String name) {
         String sql = "DELETE FROM envelopes WHERE name = ?";
 
-        try (Connection conn = DriverManager.getConnection(URL);
+        try (Connection conn = DriverManager.getConnection(getDatabasePath());
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, name);
             pstmt.executeUpdate();
@@ -251,7 +267,7 @@ public class Database {
     public static void printAllEnvelopes() {
         String sql = "SELECT * FROM envelopes";
 
-        try (Connection conn = DriverManager.getConnection(URL);
+        try (Connection conn = DriverManager.getConnection(getDatabasePath());
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -275,7 +291,7 @@ public class Database {
     public static BigDecimal getBalance() {
         BigDecimal balance = BigDecimal.ZERO; // Default value or initial value
 
-        try (Connection conn = DriverManager.getConnection(URL);
+        try (Connection conn = DriverManager.getConnection(getDatabasePath());
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT SUM(amount) AS total_amount FROM envelopes")) {
 
@@ -303,7 +319,7 @@ public class Database {
     public static Envelope getEnvelope(String name) {
         String sql = "SELECT * FROM envelopes WHERE name = ?";
 
-        try (Connection conn = DriverManager.getConnection(URL);
+        try (Connection conn = DriverManager.getConnection(getDatabasePath());
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, name);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -330,7 +346,7 @@ public class Database {
         List<Envelope> envelopes = new ArrayList<>();
         String sql = "SELECT * FROM envelopes";
 
-        try (Connection conn = DriverManager.getConnection(URL);
+        try (Connection conn = DriverManager.getConnection(getDatabasePath());
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -357,7 +373,7 @@ public class Database {
     public static Envelope getEnvelopeByPriority(int priority) {
         String sql = "SELECT * FROM envelopes WHERE priority = ?";
         
-        try (Connection conn = DriverManager.getConnection(URL);
+        try (Connection conn = DriverManager.getConnection(getDatabasePath());
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setInt(1, priority);
@@ -385,7 +401,7 @@ public class Database {
     public static Envelope getDefault() {
         String sql = "SELECT * FROM envelopes WHERE default_env = 1";
         
-        try (Connection conn = DriverManager.getConnection(URL);
+        try (Connection conn = DriverManager.getConnection(getDatabasePath());
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             
@@ -412,7 +428,7 @@ public class Database {
     public static Envelope getExtra() {
         String sql = "SELECT * FROM envelopes WHERE extra = 1";
 
-        try (Connection conn = DriverManager.getConnection(URL);
+        try (Connection conn = DriverManager.getConnection(getDatabasePath());
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
                
@@ -439,7 +455,7 @@ public class Database {
     public static boolean editAmount(String name, BigDecimal amount) {
         String sql = "UPDATE envelopes SET amount = ? WHERE name = ?";
 
-        try (Connection conn = DriverManager.getConnection(URL);
+        try (Connection conn = DriverManager.getConnection(getDatabasePath());
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, amount.toString()); // Store BigDecimal as String
             pstmt.setString(2, name);
@@ -455,7 +471,7 @@ public class Database {
 
     public static boolean hasEnvelope(String name) {
         String sql = "SELECT COUNT(*) FROM envelopes WHERE name = ?";
-        try (Connection conn = DriverManager.getConnection(URL);
+        try (Connection conn = DriverManager.getConnection(getDatabasePath());
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             // Set the parameters

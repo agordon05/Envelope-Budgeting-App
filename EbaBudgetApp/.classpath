@@ -7,8 +7,8 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
-	<classpathentry kind="lib" path="/Users/aaron/Downloads/sqlite-jdbc-3.46.0.0.jar"/>
-	<classpathentry kind="lib" path="/Users/aaron/Downloads/slf4j-simple-2.0.13.jar"/>
-	<classpathentry kind="lib" path="/Users/aaron/Downloads/slf4j-api-2.0.13.jar"/>
+	<classpathentry kind="lib" path="/Users/aaron/Desktop/GitHub Repositories/Envelope-Budgeting-App-Prototype/EbaBudgetApp/lib/slf4j-api-2.0.13.jar"/>
+	<classpathentry kind="lib" path="/Users/aaron/Desktop/GitHub Repositories/Envelope-Budgeting-App-Prototype/EbaBudgetApp/lib/slf4j-simple-2.0.13.jar"/>
+	<classpathentry kind="lib" path="/Users/aaron/Desktop/GitHub Repositories/Envelope-Budgeting-App-Prototype/EbaBudgetApp/lib/sqlite-jdbc-3.46.0.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
